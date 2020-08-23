@@ -179,7 +179,7 @@
 
         var kState = 'not detected'; //'not detected', 'k found', 'ku found', 'kSh found'
         var RState = 'not detected'; //'not detected', 'R found', 'Ru found', 'tt found'
-        var nState = 'not detected'; //'not detected', 'n found', 'nu found', 'nn found'
+        var nState = 'not detected'; //'not detected', 'n found first', 'n found', 'nu found first', 'nu found', 'nn found'
 
         var cIsUsed = false;
 
@@ -192,9 +192,9 @@
             whiteSpace = true;
             firstLetterInWord = true;
 
-            kState = 'not detected'; //'not detected', 'k found', 'ku found', 'kSh found'
-            RState = 'not detected'; //'not detected', 'R found', 'Ru found', 'tt found'
-            nState = 'not detected'; //'not detected', 'n found', 'nu found', 'nn found'
+            kState = 'not detected';
+            RState = 'not detected';
+            nState = 'not detected';
 
             const tokens = Array.from(plainText);
 
@@ -202,8 +202,11 @@
                 var c = tokens[i]; //read one unicode character
                 cIsUsed = false;
 
-                var firstLetterInWord = whiteSpace; //store whether previous c is whitespace or not
-                whiteSpace = (c.trim().length == 0); //store whether current c is whitespace or not
+                //store whether previous c is whitespace or not
+                firstLetterInWord = whiteSpace;
+
+                //store whether current c is whitespace or not
+                whiteSpace = (c.trim().length == 0);
 
                 if (c == '\u0D15') { // ക
                     if (RState != 'not detected') {
@@ -253,8 +256,8 @@
                     if (kState != 'not detected') {
                         cleanupK(c);
                     }
-                    if (nState != 'not detected') {
-                        cleanupN(c);
+                    if (RState != 'not detected') {
+                        cleanupR(c);
                     }
                     if (!forward) { //reverse i.e, Moolabhadram to Malayalam
                         if (forcePinneStyle) {
@@ -265,19 +268,24 @@
                         nState = 'not detected';
                         continue;
                     }
-                    if (nState == 'n found') { //another na came right next. convert the first na to tta or ma
-                        if (!firstLetterInWord) {
-                            cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
-                        } else {
-                            cipherText += '\u0D2E'; //na -> ma
-                        }
+
+                    if (nState == 'n found first') { //another na came right next. convert the first na to ma
+                        cipherText += '\u0D2E'; //na -> ma
+                        continue;
+                    }
+                    if (nState == 'n found') { //another na came right next. convert the first na to tta
+                        cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
                         continue;
                     }
                     if (nState == 'not detected') {
-                        nState = 'n found';
+                        if (firstLetterInWord) {
+                            nState = 'n found first';
+                        } else {
+                            nState = 'n found';
+                        }
                         continue;
                     }
-                    if (nState == 'nu found') {
+                    if (nState == 'nu found first' || nState == 'nu found') {
                         nState = 'nn found';
                         if (forcePinneStyle) {
                             cipherText += '\u0D31\u0D4D\u0D31\u0D4D\u0D31\u0D4D\u0D31'; //nna -> tttta
@@ -308,7 +316,11 @@
                         continue;
                     }
                     if (kState == 'kSh found') {
-                        cipherText += '\u0D7E'; //LL
+                        if (forward) {
+                            cipherText += '\u0D7E'; //LL
+                        } else {
+                            cipherText += '\u0D33\u0D4D'; //L
+                        }
                         kState = 'not detected';
                         continue;
                     }
@@ -317,8 +329,16 @@
                         continue;
                     }
                     if (RState == 'tt found') {
-                        cipherText += '\u0D7B'; //nn
+                        if (forward) {
+                            cipherText += '\u0D7B'; //nn
+                        } else {
+                            cipherText += '\u0D28\u0D4D'; //nu
+                        }
                         RState = 'not detected';
+                        continue;
+                    }
+                    if (nState == 'n found first') {
+                        nState = 'nu found first';
                         continue;
                     }
                     if (nState == 'n found') {
@@ -336,6 +356,12 @@
                 }
             }
 
+            /*
+            if (!forward) {
+                cipherText = polishEndChills(cipherText);
+            }
+            */
+
             document.getElementById("cipher").value = cipherText;
         }
 
@@ -347,58 +373,44 @@
                 } else {
                     cipherText += '\u0D05'; //ka -> a
                 }
-                kState = 'not detected';
-                return;
-            }
-            if (kState == 'ku found') {
+            } else if (kState == 'ku found') {
                 cipherText += '\u0D05\u0D4D'; //ka + chandrakkala -> a + chandrakkala
-                kState = 'not detected';
-                return;
-            }
-            if (kState == 'kSh found') {
+            } else if (kState == 'kSh found') {
                 cipherText += '\u0D33'; //L + mapping of next char
-                kState = 'not detected';
-                return;
             }
+            kState = 'not detected';
         }
 
         function cleanupR(c) {
             if (RState == 'R found') {
                 cipherText += '\u0D34'; //Ra -> zha
-                RState = 'not detected';
-                return;
-            }
-            if (RState == 'Ru found') {
+            } else if (RState == 'Ru found') {
                 cipherText += '\u0D34\u0D4D'; //Ra + chandrakkala -> zha + chandrakkala
-                RState = 'not detected';
-                return;
-            }
-            if (RState == 'tt found') {
+            } else if (RState == 'tt found') {
                 cipherText += '\u0D28'; //tta -> na
-                RState = 'not detected';
-                return;
             }
+            RState = 'not detected';
         }
 
         function cleanupN(c) {
-            if (nState == 'n found') {
-                if (!firstLetterInWord && forward) {
+            if (nState == 'n found first') {
+                cipherText += '\u0D2E'; //na -> ma
+            } else if (nState == 'n found') {
+                if (forward) {
                     cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
                 } else {
                     cipherText += '\u0D2E'; //na -> ma
                 }
-                nState = 'not detected';
-                return;
-            }
-            if (nState == 'nu found') {
-                if (!firstLetterInWord && forward) {
+            } else if (nState == 'nu found first') {
+                cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
+            } else if (nState == 'nu found') {
+                if (forward) {
                     cipherText += '\u0D31\u0D4D\u0D31\u0D4D'; //na + chandrakkala -> tta + chandrakkala
                 } else {
                     cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
                 }
-                nState = 'not detected';
-                return;
             }
+            nState = 'not detected';
         }
 
         function getFromBasicMap(c) {
@@ -406,6 +418,15 @@
                 return basicMap.get(c);
             }
             return c;
+        }
+
+        //unused function
+        function polishEndChills(cipherText) {
+            let t = cipherText.replace(/\u0D24\u0D4D/g, '\u0D7D'); //ത് -> ൽ
+            let n =          t.replace(/\u0D28\u0D4D/g, '\u0D7B'); //ന് -> ൻ
+            let r =          n.replace(/\u0D30\u0D4D/g, '\u0D7C'); //ര് -> ർ
+            let L =          r.replace(/\u0D33\u0D4D/g, '\u0D7E'); //ള് -> ൾ
+            return L;
         }
 </script>
 </body>
