@@ -5,11 +5,8 @@
     <title>മൂലഭദ്രം രഹസ്യ ഭാഷാ സഹായി</title>
 </head>
 <body>
-
 <center>
     <h3>മലയാളത്തിൽ നിന്നും രഹസ്യ ഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം</h3>
-
-
     <br/>
     <div>
         <table>
@@ -29,14 +26,11 @@
             </tr>
         </table>
     </div>
-
-
     <br/>
     <div>
         <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="10"
                   cols="100"></textarea>
     </div>
-
     <br/>
     <div>
         <table>
@@ -62,7 +56,8 @@
     <br/>
     <br/>
     <div>
-        <p>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra" target="_blank">Wikipedia</a>,
+        <p>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra"
+                                                target="_blank">Wikipedia</a>,
             <a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube</a></p>
     </div>
     <div>
@@ -70,14 +65,14 @@
         </p>
         </p>
     </div>
-    <br/>
-    <br/>
-
-    <footer><small>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7" target="_blank">Rajneesh Kesavan</a></small> </footer>
+    <footer>
+        <small>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7"
+                                         target="_blank">Rajneesh Kesavan</a></small>
+    </footer>
 </center>
-
 <script language="JavaScript">
-        //Convert individual Malayalam unicode characters or sequences by mapping them to another unicode character or sequence according to Moolabhadram rules
+        //Convert individual Malayalam unicode characters or sequences by mapping them to another unicode character
+        //or sequence according to Moolabhadram rules
         let basicMap = new Map([
             ['\u0D05', '\u0D15'], //a  -> ka
             ['\u0D06', '\u0D15\u0D3E'], //aa -> kaa
@@ -139,10 +134,10 @@
             ['\u0D7D', '\u0D2A\u0D4D'], //ll -> p
             ['\u0D7B', '\u0D31\u0D4D\u0D31\u0D4D'], //nn -> tt
             ['\u0D7C', '\u0D37\u0D4D'], //RR -> Sh
-            ['\u0D7E', '\u0D15\u0D4D\u0D37\u0D4D'], //LL -> kSh
+            ['\u0D7E', '\u0D15\u0D4D\u0D37\u0D4D'] //LL -> kSh
         ]);
 
-        //Map to handle the special case of ka with depedent vowel signs. like ki, kii, ku, kuu, ... ksha etc.
+        //Map to handle the special case of ka with dependent vowel signs. like ki, kii, ku, kuu, ... ksha etc.
         let kMap = new Map([
             ['\u0D15\u0D3E', '\u0D06'], //kaa  -> aa
             ['\u0D15\u0D3F', '\u0D07'], //ki   -> i
@@ -159,7 +154,7 @@
             ['\u0D15\u0D4D\u0D37', '\u0D33'] //kSha -> La
         ]);
 
-        //Set to hold all depedent vowel signs
+        //Set to hold all dependent vowel signs
         const dependentVowels = new Set();
         dependentVowels.add('\u0D3E'); //aa
         dependentVowels.add('\u0D3F'); //i
@@ -188,7 +183,6 @@
 
         var cIsUsed = false;
 
-
         function convert() {
             plainText = document.getElementById("plain").value;
             forward = document.getElementById("to_moolabhadram").checked;
@@ -212,54 +206,40 @@
                 whiteSpace = (c.trim().length == 0); //store whether current c is whitespace or not
 
                 if (c == '\u0D15') { // ക
-
                     if (RState != 'not detected') {
                         cleanupR(c);
                     }
-
                     if (nState != 'not detected') {
                         cleanupN(c);
                     }
-
                     if (kState == 'k found') { //another ka came right next. convert the first ka to a
                         cipherText += '\u0D05'; //ka -> a
                         continue;
                     }
-
                     if (kState == 'not detected') {
-                        kState = 'k found'
+                        kState = 'k found';
                         continue;
                     }
                 }
-
                 if (c == "\u0D31") { // റ
-
                     if (kState != 'not detected') {
                         cleanupK(c);
                     }
-
                     if (nState != 'not detected') {
                         cleanupN(c);
                     }
-
                     if (RState == 'R found') { //another Ra came right next. convert the first Ra to zha
                         cipherText += '\u0D34'; //Ra -> zha
                         continue;
-
-                        //RState = 'tt found';
-                        //continue;
                     }
-
                     if (RState == 'not detected') {
                         RState = 'R found';
                         continue;
                     }
-
                     if (RState == 'Ru found') {
                         RState = 'tt found';
                         continue;
                     }
-
                     if (RState == 'tt found') {
                         cipherText += '\u0D28'; //tta -> na
                         RState = 'R found';
@@ -267,30 +247,25 @@
                     }
                 }
 
-                //na to tta : for words like പന, ആന but not for നഗരം, നിശ
+                //na to tta : for words like പന, ആന
+                //na to ma : for words like നഗരം, നിശ
                 if (c == '\u0D28') { // ന
-
                     if (kState != 'not detected') {
                         cleanupK(c);
                     }
-
                     if (nState != 'not detected') {
                         cleanupN(c);
                     }
-
-
-                    if (!forward) { //reverse
+                    if (!forward) { //reverse i.e, Moolabhadram to Malayalam
                         if (forcePinneStyle) {
                             cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
                         } else {
                             cipherText += '\u0D2E'; //na -> ma
                         }
-
                         nState = 'not detected';
                         continue;
                     }
-
-                    if (nState == 'n found') { //another na came right next. convert the first na to ma or tta
+                    if (nState == 'n found') { //another na came right next. convert the first na to tta or ma
                         if (!firstLetterInWord) {
                             cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
                         } else {
@@ -298,21 +273,18 @@
                         }
                         continue;
                     }
-
                     if (nState == 'not detected') {
                         nState = 'n found';
                         continue;
                     }
-
                     if (nState == 'nu found') {
                         nState = 'nn found';
-
                         if (forcePinneStyle) {
                             cipherText += '\u0D31\u0D4D\u0D31\u0D4D\u0D31\u0D4D\u0D31'; //nna -> tttta
                         } else {
                             cipherText += '\u0D2E\u0D4D\u0D2E'; //nna -> mma
                         }
-                        nState = 'not detected'
+                        nState = 'not detected';
                         continue;
                     }
                 }
@@ -321,11 +293,9 @@
                     if (RState != 'not detected') {
                         cleanupR(c);
                     }
-
                     if (nState != 'not detected') {
                         cleanupN(c);
                     }
-
                     if (kState == 'ku found') {
                         kState = 'kSh found';
                         continue;
@@ -333,29 +303,24 @@
                 }
 
                 if (c == '\u0D4D') { //chandrakkala
-
                     if (kState == 'k found') {
                         kState = 'ku found';
                         continue;
                     }
-
                     if (kState == 'kSh found') {
                         cipherText += '\u0D7E'; //LL
                         kState = 'not detected';
                         continue;
                     }
-
                     if (RState == 'R found') {
                         RState = 'Ru found';
                         continue;
                     }
-
                     if (RState == 'tt found') {
                         cipherText += '\u0D7B'; //nn
                         RState = 'not detected';
                         continue;
                     }
-
                     if (nState == 'n found') {
                         nState = 'nu found';
                         continue;
@@ -371,7 +336,7 @@
                 }
             }
 
-            document.getElementById("cipher").value = cipherText
+            document.getElementById("cipher").value = cipherText;
         }
 
         function cleanupK(c) {
@@ -385,13 +350,11 @@
                 kState = 'not detected';
                 return;
             }
-
             if (kState == 'ku found') {
                 cipherText += '\u0D05\u0D4D'; //ka + chandrakkala -> a + chandrakkala
                 kState = 'not detected';
                 return;
             }
-
             if (kState == 'kSh found') {
                 cipherText += '\u0D33'; //L + mapping of next char
                 kState = 'not detected';
@@ -405,13 +368,11 @@
                 RState = 'not detected';
                 return;
             }
-
             if (RState == 'Ru found') {
                 cipherText += '\u0D34\u0D4D'; //Ra + chandrakkala -> zha + chandrakkala
                 RState = 'not detected';
                 return;
             }
-
             if (RState == 'tt found') {
                 cipherText += '\u0D28'; //tta -> na
                 RState = 'not detected';
@@ -426,23 +387,19 @@
                 } else {
                     cipherText += '\u0D2E'; //na -> ma
                 }
-
                 nState = 'not detected';
                 return;
             }
-
             if (nState == 'nu found') {
                 if (!firstLetterInWord && forward) {
                     cipherText += '\u0D31\u0D4D\u0D31\u0D4D'; //na + chandrakkala -> tta + chandrakkala
                 } else {
                     cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
                 }
-
                 nState = 'not detected';
                 return;
             }
         }
-
 
         function getFromBasicMap(c) {
             if (basicMap.has(c)) {
