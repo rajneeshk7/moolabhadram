@@ -6,26 +6,28 @@
 </head>
 <body>
 <center>
-    <h3>മലയാളത്തിൽ നിന്നും രഹസ്യ ഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം</h3>
+    <h3>മലയാളത്തിൽ നിന്നും രഹസ്യഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം</h3>
     <br/>
     <div>
         <table>
             <tr>
                 <td>
-                    <p>ഉചിതമായ 'ന' / 'ന്ന' സ്വരം തിരഞ്ഞെടുക്കുക</p>
+                    <h5>'ന', 'ന്ന' സ്വരങ്ങൾക്ക് അവ്യക്തത വന്നേക്കാവുന്ന വാക്കുകൾ മാറ്റുമ്പോൾ ഇവയിൽ ഒന്ന് തിരഞ്ഞെടുക്കുക</h5>
                 </td>
             </tr>
             <tr>
                 <td>
                     <input type="radio" id="innale" name="nna_swaram" value="innale" checked>
-                    <label for="innale">'നഗരം' / 'ഇന്നലെ' പോലെ</label><br>
+                    <label for="innale">'നഗരം', 'ഇന്നലെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</label><br>
                     <input type="radio" id="pinne" name="nna_swaram" value="pinne">
-                    <label for="pinne">'പാനീയം' / 'പിന്നെ' പോലെ</label><br>
+                    <label for="pinne">'പാനീയം', 'പിന്നെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</label><br>
                 </td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
             </tr>
         </table>
     </div>
+    <br/>
+    <br/>
     <br/>
     <div>
         <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="10"
@@ -61,13 +63,13 @@
             <a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube</a></p>
     </div>
     <div>
-        <p>മലയാളം അക്ഷരങ്ങൾ: <a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Unicode</a>
-        </p>
-        </p>
+        <p>മലയാളം അക്ഷരങ്ങൾ: <a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Unicode</a></p>
     </div>
     <footer>
         <small>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7"
-                                         target="_blank">Rajneesh Kesavan</a></small>
+                                         target="_blank">Rajneesh Kesavan</a>
+            <br/>Source code on <a href="https://github.com/rajneeshk7/moolabhadram"
+               target="_blank">github</a></small>
     </footer>
 </center>
 <script language="JavaScript">
@@ -137,7 +139,7 @@
             ['\u0D7E', '\u0D15\u0D4D\u0D37\u0D4D'] //LL -> kSh
         ]);
 
-        //Map to handle the special case of ka with dependent vowel signs. like ki, kii, ku, kuu, ... ksha etc.
+        //Map to handle the special case of ka with dependent vowel signs. like ki, kii, ku, kuu, ... kSha etc.
         let kMap = new Map([
             ['\u0D15\u0D3E', '\u0D06'], //kaa  -> aa
             ['\u0D15\u0D3F', '\u0D07'], //ki   -> i
@@ -268,7 +270,6 @@
                         nState = 'not detected';
                         continue;
                     }
-
                     if (nState == 'n found first') { //another na came right next. convert the first na to ma
                         cipherText += '\u0D2E'; //na -> ma
                         continue;
@@ -317,9 +318,9 @@
                     }
                     if (kState == 'kSh found') {
                         if (forward) {
-                            cipherText += '\u0D7E'; //LL
-                        } else {
                             cipherText += '\u0D33\u0D4D'; //L
+                        } else {
+                            cipherText += '\u0D7E'; //LL
                         }
                         kState = 'not detected';
                         continue;
@@ -330,9 +331,9 @@
                     }
                     if (RState == 'tt found') {
                         if (forward) {
-                            cipherText += '\u0D7B'; //nn
-                        } else {
                             cipherText += '\u0D28\u0D4D'; //nu
+                        } else {
+                            cipherText += '\u0D7B'; //nn
                         }
                         RState = 'not detected';
                         continue;
@@ -355,12 +356,6 @@
                     cipherText += getFromBasicMap(c);
                 }
             }
-
-            /*
-            if (!forward) {
-                cipherText = polishEndChills(cipherText);
-            }
-            */
 
             document.getElementById("cipher").value = cipherText;
         }
@@ -419,15 +414,7 @@
             }
             return c;
         }
-
-        //unused function
-        function polishEndChills(cipherText) {
-            let t = cipherText.replace(/\u0D24\u0D4D/g, '\u0D7D'); //ത് -> ൽ
-            let n =          t.replace(/\u0D28\u0D4D/g, '\u0D7B'); //ന് -> ൻ
-            let r =          n.replace(/\u0D30\u0D4D/g, '\u0D7C'); //ര് -> ർ
-            let L =          r.replace(/\u0D33\u0D4D/g, '\u0D7E'); //ള് -> ൾ
-            return L;
-        }
 </script>
+
 </body>
 </html>
