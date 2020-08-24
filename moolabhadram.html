@@ -30,7 +30,7 @@
     <br/>
     <br/>
     <div>
-        <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="10"
+        <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="20"
                   cols="100"></textarea>
     </div>
     <br/>
@@ -53,7 +53,7 @@
     <br/>
     <br/>
     <div>
-        <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="10" cols="100"></textarea>
+        <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="20" cols="100"></textarea>
     </div>
     <br/>
     <br/>
@@ -137,9 +137,10 @@
             ['\u0D34', '\u0D31'], //zha  -> Ra
 
             //chill aksharangal
-            ['\u0D7D', '\u0D2A\u0D4D'], //ll -> p
+            ['\u0D7A', '\u0D1E\u0D4D'], //NN -> nj
             ['\u0D7B', '\u0D31\u0D4D\u0D31\u0D4D'], //nn -> tt
             ['\u0D7C', '\u0D37\u0D4D'], //RR -> Sh
+            ['\u0D7D', '\u0D2A\u0D4D'], //ll -> p
             ['\u0D7E', '\u0D15\u0D4D\u0D37\u0D4D'] //LL -> kSh
         ]);
 
@@ -191,6 +192,7 @@
 
         function convert() {
             plainText = document.getElementById("plain").value;
+            plainText = plainText.trim() + ' '; //append one extra space to cover edge cases of trailing incomplete sequences with k, R, n
             forward = document.getElementById("to_moolabhadram").checked;
             forcePinneStyle = document.getElementById("pinne").checked;
             cipherText = '';
@@ -212,7 +214,7 @@
                 firstLetterInWord = whiteSpace;
 
                 //store whether current c is whitespace or not
-                whiteSpace = (c.trim().length == 0);
+                whiteSpace = isWhiteSpace(c);
 
                 if (c == '\u0D15') { // ക
                     if (RState != 'not detected') {
@@ -230,6 +232,7 @@
                         continue;
                     }
                 }
+
                 if (c == "\u0D31") { // റ
                     if (kState != 'not detected') {
                         cleanupK(c);
@@ -265,7 +268,7 @@
                     if (RState != 'not detected') {
                         cleanupR(c);
                     }
-                    if (!forward) { //reverse i.e, Moolabhadram to Malayalam
+                    if (!forward) { //reverse i.e., Moolabhadram to Malayalam
                         if (forcePinneStyle) {
                             cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
                         } else {
@@ -316,15 +319,43 @@
                 }
 
                 if (c == '\u0D4D') { //chandrakkala
+
+                    if (isPrevCharAnyChill(tokens, i)) {
+                        //ignore this extra chandrakkala and continue
+                        continue;
+                    }
+
+                    if (!forward) { //reverse i.e., Moolabhadram to Malayalam
+                        if (isWhiteSpace(getNextChar(tokens, i)) && isPrevCharPa(tokens, i)) {
+                            //replace പ് with ൽ instead of ത് if it comes as the last letter of a word
+                            //But exclude cases like (അത് ഇത് ഏത് മറ്റേത് പലത്), എന്ത്, ഇല്ലത്ത്
+                            if (!isPrevCharAEtc(cipherText) && !isPrev2CharsNu(cipherText) && !isPrev2CharsThu(cipherText)) {
+                                cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7D'; //ൽ
+                            } else {
+                                cipherText += '\u0D4D'; //ത്
+                            }
+                            continue;
+                        } else if (kState != 'kSh found' && isWhiteSpace(getNextChar(tokens, i)) && isPrevCharSha(tokens, i)) {
+                            //replace ഷ് with ർ instead of ര് if it comes as the last letter of a word
+                            cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7C'; //ർ
+                            continue;
+                        } /* else if (isWhiteSpace(getNextChar(tokens, i)) && isPrevCharNja(tokens, i)) { //cases like കോൺ
+                            //replace ഞ് with ൺ instead of ണ്
+                            cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7A'; //ൺ
+                            continue;
+                        } */
+                    }
+
                     if (kState == 'k found') {
                         kState = 'ku found';
                         continue;
                     }
                     if (kState == 'kSh found') {
-                        if (forward) {
-                            cipherText += '\u0D33\u0D4D'; //L
+                        if (!isWhiteSpace(getNextChar(tokens, i))
+                        || isPrev4CharsKShu(tokens, i-3)) {
+                            cipherText += '\u0D33\u0D4D'; //ള്   കള്ള് വെള്ളരി
                         } else {
-                            cipherText += '\u0D7E'; //LL
+                            cipherText += '\u0D7E'; //ൾ  മക്കൾ
                         }
                         kState = 'not detected';
                         continue;
@@ -334,10 +365,15 @@
                         continue;
                     }
                     if (RState == 'tt found') {
-                        if (forward) {
+                        if (!isWhiteSpace(getNextChar(tokens, i))
+                        && !isNextCharTha(tokens, i)      //തേൻപുഴ
+                        && !isNextCharZha(tokens, i)) {   //എൻ്റെ
                             cipherText += '\u0D28\u0D4D'; //nu
                         } else {
                             cipherText += '\u0D7B'; //nn
+                            if (isNextCharZha(tokens, i)) {
+                                cipherText += '\u0D4D'; //append an extra chandrakkala to tidy up handling of എൻ്റെ
+                            }
                         }
                         RState = 'not detected';
                         continue;
@@ -417,6 +453,146 @@
                 return basicMap.get(c);
             }
             return c;
+        }
+
+        function getNextChar(tokens, i) {
+            var next = i+1;
+            if (next < tokens.length) {
+                return tokens[next];
+            }
+            return ' ';
+        }
+
+        function isWhiteSpace(cc) {
+            var result = (cc.trim().length == 0);
+            return result;
+        }
+
+        function isNextCharTha(tokens, i) {
+            var next = i+1;
+            if (next < tokens.length) {
+                //ത is coming which will map to പ
+                return (tokens[next] == '\u0D24');
+            }
+            return false;
+        }
+
+        function isNextCharZha(tokens, i) {
+            var next = i+1;
+            if (next < tokens.length) {
+                //ഴ is coming which will map to റ
+                return (tokens[next] == '\u0D34');
+            }
+            return false;
+        }
+
+        function isPrev4CharsKShu(tokens, i) {
+            var result = false;
+            var prev1 = i-1;
+            var prev2 = i-2;
+            var prev3 = i-3;
+            var prev4 = i-4;
+            if (prev4 >= 0) {
+                //ക്ഷ് was present which mapped to ള്
+                result = ( (tokens[prev4] == '\u0D15') && (tokens[prev3] == '\u0D4D') && (tokens[prev2] == '\u0D37') && (tokens[prev1] == '\u0D4D') );
+            }
+            //console.log('isPrev4CharsKShu : '+result);
+            return result;
+        }
+
+        function isPrevCharPa(tokens, i) {
+            var result = false;
+            var prev1 = i-1;
+            if (prev1 >= 0) {
+                //പ was present which was mapped to ത
+                result = (tokens[prev1] == '\u0D2A');
+            }
+            //console.log('isPrevCharPa : '+result);
+            return result;
+        }
+
+        function isPrevCharSha(tokens, i) {
+            var result = false;
+            var prev1 = i-1;
+            if (prev1 >= 0) {
+                //ഷ was present which was mapped to ര
+                result = (tokens[prev1] == '\u0D37');
+            }
+            //console.log('isPrevCharSha : '+result);
+            return result;
+        }
+
+        function isPrevCharNja(tokens, i) {
+            var result = false;
+            var prev1 = i-1;
+            if (prev1 >= 0) {
+                //ഞ was present which was mapped to ണ
+                result = (tokens[prev1] == '\u0D1E');
+            }
+            //console.log('isPrevCharNja : '+result);
+            return result;
+        }
+
+        //exclude അത് ഇത് ഏത് മറ്റേത് പലത്
+        function isPrevCharAEtc(cipherText) {
+            var result = false;
+            if (cipherText.length > 1) {
+                //അ ഇ ല etc. was present
+                result = (     (cipherText.charAt(cipherText.length-2) == '\u0D05')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D07')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D0A')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D0F')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D3E')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D43')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D46')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D47')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D2F')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D30')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D31')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D32')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D33')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D34')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D35')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D36')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D37')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D38')
+                            || (cipherText.charAt(cipherText.length-2) == '\u0D39')
+                            );
+            }
+            //console.log('isPrevCharAEtc : '+result);
+            return result;
+        }
+
+        function isPrev2CharsNu(cipherText) {
+            var result = false;
+            if (cipherText.length > 2) {
+                //ന് was present
+                result = ( (cipherText.charAt(cipherText.length-3) == '\u0D28') && (cipherText.charAt(cipherText.length-2) == '\u0D4D') );
+            }
+            //console.log('isPrev2CharsNu : '+result);
+            return result;
+        }
+
+        function isPrev2CharsThu(cipherText) {
+            var result = false;
+            if (cipherText.length > 2) {
+                //ത് was present
+                result = ( (cipherText.charAt(cipherText.length-3) == '\u0D24') && (cipherText.charAt(cipherText.length-2) == '\u0D4D') );
+            }
+            //console.log('isPrev2CharsThu : '+result);
+            return result;
+        }
+
+        function isPrevCharAnyChill(tokens, i) {
+            var result = false;
+            var prev1 = i-1;
+            if (prev1 >= 0) {
+                //check chandrakkala and all chills
+                result = ( (tokens[prev1] == '\u0D4D') || (tokens[prev1] == '\u0D7A') || (tokens[prev1] == '\u0D7B')
+                || (tokens[prev1] == '\u0D7C') || (tokens[prev1] == '\u0D7D') || (tokens[prev1] == '\u0D7E'));
+            }
+            //console.log('isPrevCharAnyChill : '+result);
+            return result;
         }
 </script>
 
