@@ -8,67 +8,41 @@
 <center>
     <h3>മലയാളത്തിൽ നിന്നും രഹസ്യഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം</h3>
     <br/>
-    <div>
-        <table>
-            <tr>
-                <td>
-                    <h5>'ന', 'ന്ന' സ്വരങ്ങൾക്ക് അവ്യക്തത വന്നേക്കാവുന്ന വാക്കുകൾ മാറ്റുമ്പോൾ ഇവയിൽ ഒന്ന് തിരഞ്ഞെടുക്കുക</h5>
-                </td>
-            </tr>
-            <tr>
-                <td style="font-size: 12px">
-                    <input type="radio" id="innale" name="nna_swaram" value="innale" checked>
-                    <label for="innale">'നഗരം', 'ഇന്നലെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</label><br>
-                    <input type="radio" id="pinne" name="nna_swaram" value="pinne">
-                    <label for="pinne">'പാനീയം', 'പിന്നെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</label><br>
-                </td>
-                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-            </tr>
-        </table>
-    </div>
+    <h5>'ന', 'ന്ന' സ്വരങ്ങൾക്ക് അവ്യക്തത വന്നേക്കാവുന്ന വാക്കുകൾ മാറ്റുമ്പോൾ</h5>
+    <input type="radio" id="innale" name="nna_swaram" value="innale" checked>
+    <label for="innale">നഗരം, ഇന്നലെ </label><br/>
+    <input type="radio" id="pinne" name="nna_swaram" value="pinne">
+    <label for="pinne">ഗഗനം, മിന്നൽ</label><br/>
+    <h5>പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</h5>
+    <br/><br/><br/>
+    <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="12"
+              cols="100" style="border:solid 1px black;"></textarea>
+    <br/><br/>
+    <input type="radio" id="to_moolabhadram" name="direction" value="to_moolabhadram" checked>
+    <label for="to_moolabhadram">മൂലഭദ്രത്തിലേക്ക്</label><br/>
     <br/>
+    <input type="radio" id="to_malayalam" name="direction" value="to_malayalam">
+    <label for="to_malayalam">മലയാളത്തിലേക്ക്</label><br/>
     <br/>
-    <br/>
-    <div>
-        <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="12"
-                  cols="100" style="border:solid 1px black; font-size: 12px"></textarea>
-    </div>
-    <br/>
-    <div>
-        <table>
-            <tr style="font-size: 15px">
-                <td>
-                    <input type="radio" id="to_moolabhadram" name="direction" value="to_moolabhadram" checked>
-                    <label for="to_moolabhadram">മൂലഭദ്രത്തിലേക്ക്</label><br/>
-                    <br/>
-                    <input type="radio" id="to_malayalam" name="direction" value="to_malayalam">
-                    <label for="to_malayalam">മലയാളത്തിലേക്ക്</label><br/>
-                </td>
-                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                <td>
-                    <button onclick="convert()" style="font-weight:bold;">മാറ്റുക</button>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <br/>
-    <br/>
-    <div>
-        <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="12" cols="100" style="border:solid 1px black; font-size: 12px"></textarea>
-    </div>
-    <br/>
-    <br/>
-    <footer style="font-size: 12px">
+    <button onclick="convert()" style="font-weight:bold;">മാറ്റുക</button>
+    <br/><br/>
+    <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="12" cols="100"
+              style="border:solid 1px black;"></textarea>
+    <br/><br/>
+    <footer>
+        <small>
             <br/>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra"
-                                                        target="_blank">Wikipedia</a>
-                    &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube Part 1</a>
-                    &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=32MTNi2F470" target="_blank">YouTube Part 2</a>
-            <br/>മലയാളം അക്ഷരങ്ങൾ Unicode: <a href="https://everythingfonts.com/unicode/malayalam" target="_blank">Quick reference</a>
-                    &nbsp;&nbsp;<a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Detailed</a>
+                                                      target="_blank">Wikipedia</a>
+            &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube Part 1</a>
+            &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=32MTNi2F470" target="_blank">YouTube Part 2</a>
+            <br/>മലയാളം അക്ഷരങ്ങൾ Unicode: <a href="https://everythingfonts.com/unicode/malayalam" target="_blank">Quick
+            reference</a>
+            &nbsp;&nbsp;<a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Detailed</a>
             <br/>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7"
-                                         target="_blank">Rajneesh Kesavan</a>
+                                           target="_blank">Rajneesh Kesavan</a>
             <br/>Source code on <a href="https://github.com/rajneeshk7/moolabhadram"
-               target="_blank">GitHub</a>
+                                   target="_blank">GitHub</a>
+        </small>
     </footer>
 </center>
 <script language="JavaScript">
