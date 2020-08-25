@@ -12,15 +12,15 @@
         <table>
             <tr>
                 <td>
-                    <h5>'ന', 'ന്ന' സ്വരങ്ങൾക്ക് അവ്യക്തത വന്നേക്കാവുന്ന വാക്കുകൾ മാറ്റുമ്പോൾ ഇവയിൽ ഒന്ന് തിരഞ്ഞെടുക്കുക</h5>
+                    <h6>'ന', 'ന്ന' സ്വരങ്ങൾക്ക് അവ്യക്തത വന്നേക്കാവുന്ന വാക്കുകൾ മാറ്റുമ്പോൾ ഇവയിൽ ഒന്ന് തിരഞ്ഞെടുക്കുക</h6>
                 </td>
             </tr>
             <tr>
                 <td>
                     <input type="radio" id="innale" name="nna_swaram" value="innale" checked>
-                    <label for="innale">'നഗരം', 'ഇന്നലെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</label><br>
+                    <label for="innale"><small>'നഗരം', 'ഇന്നലെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</small></label><br>
                     <input type="radio" id="pinne" name="nna_swaram" value="pinne">
-                    <label for="pinne">'പാനീയം', 'പിന്നെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</label><br>
+                    <label for="pinne"><small>'പാനീയം', 'പിന്നെ' പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</small></label><br>
                 </td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
             </tr>
@@ -31,7 +31,7 @@
     <br/>
     <div>
         <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="12"
-                  cols="100"></textarea>
+                  cols="100" style="border:solid 1px black;"></textarea>
     </div>
     <br/>
     <div>
@@ -39,13 +39,14 @@
             <tr>
                 <td>
                     <input type="radio" id="to_moolabhadram" name="direction" value="to_moolabhadram" checked>
-                    <label for="to_moolabhadram">മൂലഭദ്രത്തിലേക്ക്</label><br>
+                    <label for="to_moolabhadram">മൂലഭദ്രത്തിലേക്ക്</label><br/>
+                    <br/>
                     <input type="radio" id="to_malayalam" name="direction" value="to_malayalam">
-                    <label for="to_malayalam">മലയാളത്തിലേക്ക്</label><br>
+                    <label for="to_malayalam">മലയാളത്തിലേക്ക്</label><br/>
                 </td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td>
-                    <button onclick="convert()">മാറ്റുക</button>
+                    <button onclick="convert()" style="font-weight:bold;">മാറ്റുക</button>
                 </td>
             </tr>
         </table>
@@ -53,27 +54,23 @@
     <br/>
     <br/>
     <div>
-        <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="12" cols="100"></textarea>
+        <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="12" cols="100" style="border:solid 1px black;"></textarea>
     </div>
     <br/>
     <br/>
-    <div>
-        <p>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra"
-                                                target="_blank">Wikipedia</a>
-            &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube Part 1</a>
-            &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=32MTNi2F470" target="_blank">YouTube Part 2</a>
-        </p>
-    </div>
-    <div>
-        <p>മലയാളം അക്ഷരങ്ങൾ Unicode: <a href="https://everythingfonts.com/unicode/malayalam" target="_blank">Quick reference</a>
-            &nbsp;&nbsp;<a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Detailed</a>
-        </p>
-    </div>
     <footer>
-        <small>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7"
+        <small>
+            <br/>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra"
+                                                        target="_blank">Wikipedia</a>
+                    &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube Part 1</a>
+                    &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=32MTNi2F470" target="_blank">YouTube Part 2</a>
+            <br/>മലയാളം അക്ഷരങ്ങൾ Unicode: <a href="https://everythingfonts.com/unicode/malayalam" target="_blank">Quick reference</a>
+                    &nbsp;&nbsp;<a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Detailed</a>
+            <br/>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7"
                                          target="_blank">Rajneesh Kesavan</a>
             <br/>Source code on <a href="https://github.com/rajneeshk7/moolabhadram"
-               target="_blank">GitHub</a></small>
+               target="_blank">GitHub</a>
+        </small>
     </footer>
 </center>
 <script language="JavaScript">
@@ -92,7 +89,7 @@
             ['\u0D10', '\u0D15\u0D48'], //ai -> kai
             ['\u0D12', '\u0D15\u0D4A'], //o  -> ko
             ['\u0D13', '\u0D15\u0D4B'], //O  -> kO
-            ['\u0D14', '\u0D15\u0D4C'], //ou -> kou
+            ['\u0D14', '\u0D15\u0D57'], //ou -> kou
 
             ['\u0D15', '\u0D05'], //ka   -> a
             ['\u0D16', '\u0D17'], //kha  -> ga
@@ -158,6 +155,7 @@
             ['\u0D15\u0D4A', '\u0D12'], //ko   -> o
             ['\u0D15\u0D4B', '\u0D13'], //kO   -> O
             ['\u0D15\u0D4C', '\u0D14'], //kou  -> ou
+            ['\u0D15\u0D57', '\u0D14'], //kou  -> ou
             ['\u0D15\u0D4D\u0D37', '\u0D33'] //kSha -> La
         ]);
 
@@ -174,7 +172,8 @@
         dependentVowels.add('\u0D48'); //ai
         dependentVowels.add('\u0D4A'); //o
         dependentVowels.add('\u0D4B'); //O
-        dependentVowels.add('\u0D4C'); //ou
+        dependentVowels.add('\u0D4C'); //ou (old)
+        dependentVowels.add('\u0D57'); //ou (new)
 
         var plainText = document.getElementById("plain").value;
         var forward = true;
