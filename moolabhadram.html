@@ -181,7 +181,7 @@
         var forcePinneStyle = false;
         var cipherText = '';
 
-        var whiteSpace = true;
+        var nonMalayalamChar = true;
         var firstLetterInWord = true;
 
         var kState = 'not detected'; //'not detected', 'k found', 'ku found', 'kSh found'
@@ -197,7 +197,7 @@
             forcePinneStyle = document.getElementById("pinne").checked;
             cipherText = '';
 
-            whiteSpace = true;
+            nonMalayalamChar = true;
             firstLetterInWord = true;
 
             kState = 'not detected';
@@ -210,11 +210,11 @@
                 var c = tokens[i]; //read one unicode character
                 cIsUsed = false;
 
-                //store whether previous c is whitespace or not
-                firstLetterInWord = whiteSpace;
+                //store whether previous c is Malayalam or not
+                firstLetterInWord = nonMalayalamChar;
 
-                //store whether current c is whitespace or not
-                whiteSpace = isWhiteSpace(c);
+                //store whether current c is Malayalam or not
+                nonMalayalamChar = !isMalayalamChar(c);
 
                 if (c == '\u0D15') { // ക
                     if (RState != 'not detected') {
@@ -269,10 +269,14 @@
                         cleanupR(c);
                     }
                     if (!forward) { //reverse i.e., Moolabhadram to Malayalam
-                        if (forcePinneStyle) {
-                            cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
-                        } else {
+                        if (firstLetterInWord) {
                             cipherText += '\u0D2E'; //na -> ma
+                        } else {
+                            if (forcePinneStyle) {
+                                cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
+                            } else {
+                                cipherText += '\u0D2E'; //na -> ma
+                            }
                         }
                         nState = 'not detected';
                         continue;
@@ -326,7 +330,7 @@
                     }
 
                     if (!forward) { //reverse i.e., Moolabhadram to Malayalam
-                        if (isWhiteSpace(getNextChar(tokens, i)) && isPrevCharPa(tokens, i)) {
+                        if (!isMalayalamChar(getNextChar(tokens, i)) && isPrevCharPa(tokens, i)) {
                             //replace പ് with ൽ instead of ത് if it comes as the last letter of a word
                             //But exclude cases like (അത് ഇത് ഏത് മറ്റേത് പലത്), എന്ത്, ഇല്ലത്ത്
                             if (!isPrevCharAEtc(cipherText) && !isPrev2CharsNu(cipherText) && !isPrev2CharsThu(cipherText)) {
@@ -335,11 +339,11 @@
                                 cipherText += '\u0D4D'; //ത്
                             }
                             continue;
-                        } else if (kState != 'kSh found' && isWhiteSpace(getNextChar(tokens, i)) && isPrevCharSha(tokens, i)) {
+                        } else if (kState != 'kSh found' && !isMalayalamChar(getNextChar(tokens, i)) && isPrevCharSha(tokens, i)) {
                             //replace ഷ് with ർ instead of ര് if it comes as the last letter of a word
                             cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7C'; //ർ
                             continue;
-                        } /* else if (isWhiteSpace(getNextChar(tokens, i)) && isPrevCharNja(tokens, i)) { //cases like കോൺ
+                        } /* else if (!isMalayalamChar(getNextChar(tokens, i)) && isPrevCharNja(tokens, i)) { //cases like കോൺ
                             //replace ഞ് with ൺ instead of ണ്
                             cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7A'; //ൺ
                             continue;
@@ -351,7 +355,7 @@
                         continue;
                     }
                     if (kState == 'kSh found') {
-                        if (!isWhiteSpace(getNextChar(tokens, i))
+                        if (isMalayalamChar(getNextChar(tokens, i))
                         || isPrev4CharsKShu(tokens, i-3)) {
                             cipherText += '\u0D33\u0D4D'; //ള്   കള്ള് വെള്ളരി
                         } else {
@@ -365,7 +369,7 @@
                         continue;
                     }
                     if (RState == 'tt found') {
-                        if (!isWhiteSpace(getNextChar(tokens, i))
+                        if (isMalayalamChar(getNextChar(tokens, i))
                         && !isNextCharTha(tokens, i)      //തേൻപുഴ
                         && !isNextCharZha(tokens, i)) {   //എൻ്റെ
                             cipherText += '\u0D28\u0D4D'; //nu
@@ -465,6 +469,11 @@
 
         function isWhiteSpace(cc) {
             var result = (cc.trim().length == 0);
+            return result;
+        }
+
+        function isMalayalamChar(cc) {
+            var result = ( (cc >= '\u0D00') && (cc <= '\u0D7F') );
             return result;
         }
 
