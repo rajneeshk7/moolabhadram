@@ -256,8 +256,12 @@
                         cipherText += '\u0D2E'; //na -> ma
                         continue;
                     }
-                    if (nState == 'n found') { //another na came right next. convert the first na to tta
-                        cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
+                    if (nState == 'n found') { //another na came right next. convert the first na to ma or tta
+                        if (forcePinneStyle) {
+                            cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
+                        } else {
+                            cipherText += '\u0D2E'; //na -> ma
+                        }
                         continue;
                     }
                     if (nState == 'not detected') {
@@ -407,7 +411,11 @@
                 cipherText += '\u0D2E'; //na -> ma
             } else if (nState == 'n found') {
                 if (forward) {
-                    cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
+                    if (forcePinneStyle) {
+                        cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
+                    } else {
+                        cipherText += '\u0D2E'; //na -> ma
+                    }
                 } else {
                     cipherText += '\u0D2E'; //na -> ma
                 }
@@ -415,7 +423,11 @@
                 cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
             } else if (nState == 'nu found') {
                 if (forward) {
-                    cipherText += '\u0D31\u0D4D\u0D31\u0D4D'; //na + chandrakkala -> tta + chandrakkala
+                    if (forcePinneStyle) {
+                        cipherText += '\u0D31\u0D4D\u0D31\u0D4D'; //na + chandrakkala -> tta + chandrakkala
+                    } else {
+                        cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
+                    }
                 } else {
                     cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
                 }
