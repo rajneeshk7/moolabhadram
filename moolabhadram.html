@@ -307,7 +307,7 @@
                     if (!forward) { //reverse i.e., Moolabhadram to Malayalam
                         if (!isMalayalamChar(getNextChar(tokens, i)) && isPrevCharPa(tokens, i)) {
                             //replace പ് with ൽ instead of ത് if it comes as the last letter of a word
-                            //But exclude cases like (അത് ഇത് ഏത് മറ്റേത് പലത്), എന്ത്, ഇല്ലത്ത്
+                            //But exclude cases like (അത് ഇത് ഏത് മറ്റേത് ചിരാത് പലത്), എന്ത്, ഇല്ലത്ത്
                             if (!isPrevCharAEtc(cipherText) && !isPrev2CharsNu(cipherText) && !isPrev2CharsThu(cipherText)) {
                                 cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7D'; //ൽ
                             } else {
@@ -344,15 +344,9 @@
                         continue;
                     }
                     if (RState == 'tt found') {
-                        if (isMalayalamChar(getNextChar(tokens, i))
-                        && !isNextCharTha(tokens, i)      //തേൻപുഴ
-                        && !isNextCharZha(tokens, i)) {   //എൻ്റെ
-                            cipherText += '\u0D28\u0D4D'; //nu
-                        } else {
-                            cipherText += '\u0D7B'; //nn
-                            if (isNextCharZha(tokens, i)) {
-                                cipherText += '\u0D4D'; //append an extra chandrakkala to tidy up handling of എൻ്റെ
-                            }
+                        cipherText += '\u0D7B'; //nn (regardless of direction)
+                        if (isNextCharZha(tokens, i)) {
+                            cipherText += '\u0D4D'; //append an extra chandrakkala to tidy up handling of എൻ്റെ
                         }
                         RState = 'not detected';
                         continue;
@@ -458,15 +452,6 @@
         function isMalayalamChar(cc) {
             var result = ( (cc >= '\u0D00') && (cc <= '\u0D7F') );
             return result;
-        }
-
-        function isNextCharTha(tokens, i) {
-            var next = i+1;
-            if (next < tokens.length) {
-                //ത is coming which will map to പ
-                return (tokens[next] == '\u0D24');
-            }
-            return false;
         }
 
         function isNextCharZha(tokens, i) {
