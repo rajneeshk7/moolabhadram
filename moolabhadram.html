@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+    </style>
     <title>മൂലഭദ്രം രഹസ്യഭാഷാ സഹായി</title>
 </head>
 <body>
@@ -28,7 +35,283 @@
     <br/><br/><br/>
     <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="12" cols="100"
               style="border:solid 1px black;"></textarea>
-    <br/><br/>
+    <br/><br/><br/><br/>
+    <h5><span id="Vowels">സ്വരാക്ഷരങ്ങൾ</span></h5>
+    <table>
+        <tbody >
+        <tr>
+            <td>അ
+            </td>
+            <td>ആ
+            </td>
+            <td>ഇ
+            </td>
+            <td>ഈ
+            </td>
+            <td>ഉ
+            </td>
+            <td>ഊ
+            </td>
+            <td>ഋ
+            </td>
+            <td>എ
+            </td>
+            <td>ഏ
+            </td>
+            <td>ഐ
+            </td>
+            <td>ഒ
+            </td>
+            <td>ഓ
+            </td>
+            <td>ഔ
+            </td>
+            <td>അം
+            </td>
+            <td>അഃ
+            </td>
+        </tr>
+        <tr>
+            <td>ക
+            </td>
+            <td>കാ
+            </td>
+            <td>കി
+            </td>
+            <td>കീ
+            </td>
+            <td>കു
+            </td>
+            <td>കൂ
+            </td>
+            <td>കൃ
+            </td>
+            <td>കെ
+            </td>
+            <td>കേ
+            </td>
+            <td>കൈ
+            </td>
+            <td>കൊ
+            </td>
+            <td>കോ
+            </td>
+            <td>കൗ
+            </td>
+            <td>കം
+            </td>
+            <td>കഃ
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h5><span id="Consonants">വ്യഞ്ജനാക്ഷരങ്ങൾ</span></h5>
+    <table>
+        <tbody>
+        <tr>
+            <td>ക
+            </td>
+            <td>ഖ
+            </td>
+            <td>ഗ
+            </td>
+            <td>ഘ
+            </td>
+            <td>ങ
+            </td>
+            <td>ച
+            </td>
+            <td>ഛ
+            </td>
+            <td>ജ
+            </td>
+            <td>ഝ
+            </td>
+            <td>ഞ
+            </td>
+            <td>ട
+            </td>
+            <td>ഠ
+            </td>
+            <td>ഡ
+            </td>
+            <td>ഢ
+            </td>
+            <td>ണ
+            </td>
+            <td>ത
+            </td>
+            <td>ഥ
+            </td>
+            <td>ദ
+            </td>
+            <td>ധ
+            </td>
+            <td>ന
+            </td>
+            <td>പ
+            </td>
+            <td>ഫ
+            </td>
+            <td>ബ
+            </td>
+            <td>ഭ
+            </td>
+            <td>മ
+            </td>
+        </tr>
+        <tr>
+            <td>അ
+            </td>
+            <td>ഗ
+            </td>
+            <td>ഖ
+            </td>
+            <td>ങ
+            </td>
+            <td>ഘ
+            </td>
+            <td>ട
+            </td>
+            <td>ഠ
+            </td>
+            <td>ഡ
+            </td>
+            <td>ഢ
+            </td>
+            <td>ണ
+            </td>
+            <td>ച
+            </td>
+            <td>ഛ
+            </td>
+            <td>ജ
+            </td>
+            <td>ഝ
+            </td>
+            <td>ഞ
+            </td>
+            <td>പ
+            </td>
+            <td>ഫ
+            </td>
+            <td>ബ
+            </td>
+            <td>ഭ
+            </td>
+            <td>മ
+            </td>
+            <td>ത
+            </td>
+            <td>ഥ
+            </td>
+            <td>ദ
+            </td>
+            <td>ധ
+            </td>
+            <td>ന
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <table>
+        <tbody>
+        <tr>
+            <td>യ
+            </td>
+            <td>ര
+            </td>
+            <td>ല
+            </td>
+            <td>വ
+            </td>
+            <td>ശ
+            </td>
+            <td>ഷ
+            </td>
+            <td>സ
+            </td>
+            <td>ഹ
+            </td>
+            <td>ള
+            </td>
+            <td>ഴ
+            </td>
+            <td>റ
+            </td>
+        </tr>
+        <tr>
+            <td>ശ
+            </td>
+            <td>ഷ
+            </td>
+            <td>സ
+            </td>
+            <td>ഹ
+            </td>
+            <td>യ
+            </td>
+            <td>ര
+            </td>
+            <td>ല
+            </td>
+            <td>വ
+            </td>
+            <td>ക്ഷ
+            </td>
+            <td>റ
+            </td>
+            <td>ഴ
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h5><span id="Special case">പ്രത്യേകം ('പന'യിലെ 'ന')</span></h5>
+    <table>
+        <tbody>
+        <tr>
+            <td>ന
+            </td>
+            <td>റ്റ
+            </td>
+        </tr>
+        <tr>
+            <td>റ്റ
+            </td>
+            <td>ന
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h5><span id="Chillus">ചില്ല് അക്ഷരങ്ങൾ</span></h5>
+    <table>
+        <tbody>
+        <tr>
+            <td>ൽ
+            </td>
+            <td>ൻ
+            </td>
+            <td>ർ
+            </td>
+            <td>ൾ
+            </td>
+        </tr>
+        <tr>
+            <td>പ്
+            </td>
+            <td>റ്റ്
+            </td>
+            <td>ഷ്
+            </td>
+            <td>ക്ഷ്
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/><br/><br/><br/>
     <footer>
         <small>
             <br/>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra"
@@ -571,6 +854,7 @@
             //console.log('isPrevCharAnyChill : '+result);
             return result;
         }
+
 </script>
 
 </body>
