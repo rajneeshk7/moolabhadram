@@ -485,6 +485,12 @@
                         cipherText += '\u0D05'; //ka -> a
                         continue;
                     }
+                    if (kState == 'ku found') { //ക് followed by ക
+                        //record ക് and proceed
+                        cipherText += '\u0D05\u0D4D'; //ka + chandrakkala -> a + chandrakkala
+                        kState = 'k found';
+                        continue;
+                    }
                     if (kState == 'not detected') {
                         kState = 'k found';
                         continue;
