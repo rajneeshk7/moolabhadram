@@ -1,871 +1,577 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="മലയാളത്തിൽ നിന്നും രഹസ്യഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം. Convert Malayalam text to the Moolabhadram (Mulabhadra) secret code and back.">
+    <meta name="color-scheme" content="light dark">
+    <title>മൂലഭദ്രം രഹസ്യഭാഷാ സഹായി</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
+        :root {
+            --bg: #ECF2E9;
+            --surface: #FBFCF7;
+            --ink: #12302A;
+            --muted: #566B63;
+            --line: #C5D3C8;
+            --green: #1C6A50;
+            --green-ink: #FFFFFF;
+            --ochre: #C98A0C;
+            --ochre-soft: #F6E7BF;
+            --font: 'Anek Malayalam', 'Noto Sans Malayalam', 'Manjari', 'Rachana', system-ui, sans-serif;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0D1F1A;
+                --surface: #142C26;
+                --ink: #E7F0E6;
+                --muted: #9CB3A9;
+                --line: #2B4A40;
+                --green: #63C29C;
+                --green-ink: #0D1F1A;
+                --ochre: #EBB942;
+                --ochre-soft: #3A3317;
+            }
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: var(--font);
+            font-size: 1.0625rem;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+        }
+        .page { max-width: 68rem; margin: 0 auto; padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem) 3rem; }
+
+        /* ---------- Header: the name, and the name in code ---------- */
+        header { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+        h1 {
+            margin: 0;
+            font-size: clamp(2.6rem, 9vw, 4.75rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }
+        h1 .coded { display: block; color: var(--ochre); }
+        .lede { margin: .75rem 0 0; max-width: 34em; color: var(--muted); }
+
+        /* ---------- Controls ---------- */
+        button, textarea { font: inherit; color: inherit; }
+        :focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; }
+
+        .segmented {
+            display: inline-flex;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--surface);
+        }
+        .segmented button {
+            border: 0;
+            background: none;
+            padding: .45rem 1.1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--muted);
+        }
+        .segmented button[aria-pressed="true"] { background: var(--green); color: var(--green-ink); }
+
+        .direction { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+        .btn {
+            border: 1px solid var(--line);
+            background: var(--surface);
+            border-radius: 999px;
+            padding: .35rem .95rem;
+            cursor: pointer;
+            font-size: .95rem;
+            font-weight: 500;
+        }
+        .btn:hover { border-color: var(--green); }
+        .btn:disabled { opacity: .45; cursor: default; border-color: var(--line); }
+        .btn.primary { background: var(--green); border-color: var(--green); color: var(--green-ink); }
+
+        /* ---------- The two panes ---------- */
+        .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .pane {
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .pane.result { border-color: var(--ochre); }
+        .pane:focus-within { border-color: var(--green); }
+        .pane-head, .pane-foot { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .6rem .9rem; }
+        .pane-head { font-weight: 600; border-bottom: 1px solid var(--line); }
+        .pane.result .pane-head { background: var(--ochre-soft); }
+        .pane-foot { justify-content: flex-end; flex-wrap: wrap; }
+        .pane textarea {
+            flex: 1;
+            width: 100%;
+            min-height: 13rem;
+            padding: .9rem;
+            border: 0;
+            outline: 0;
+            resize: vertical;
+            background: transparent;
+            font-size: 1.3rem;
+            line-height: 1.75;
+        }
+        .pane textarea::placeholder { color: var(--muted); opacity: .75; }
+
+        /* ---------- Options ---------- */
+        .options { margin-top: 1.5rem; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+        .option h2 { margin: 0 0 .15rem; font-size: 1rem; font-weight: 600; }
+        .option p { margin: 0 0 .6rem; color: var(--muted); font-size: .95rem; }
+        .choices { display: flex; flex-wrap: wrap; gap: .5rem; }
+        .choice {
+            text-align: left;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            border-radius: 12px;
+            padding: .5rem .85rem;
+            cursor: pointer;
+            min-width: 8.5rem;
+        }
+        .choice b { display: block; font-weight: 600; }
+        .choice span { color: var(--muted); font-size: .95rem; }
+        .choice[aria-pressed="true"] { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+        [hidden] { display: none !important; }
+
+        /* ---------- Letter table ---------- */
+        .reference { margin-top: 2.5rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+        .reference summary { cursor: pointer; font-size: 1.25rem; font-weight: 600; padding: .25rem 0; }
+        .reference h3 { margin: 1.4rem 0 .6rem; font-size: 1rem; font-weight: 600; color: var(--muted); }
+        .pairs { display: flex; flex-wrap: wrap; gap: .4rem; }
+        .pair {
+            display: grid;
+            grid-template-rows: auto auto;
+            min-width: 3.1rem;
             text-align: center;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--surface);
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+        .pair span { padding: .3rem .55rem; }
+        .pair span + span { background: var(--ochre-soft); border-top: 1px solid var(--line); }
+        .reference .note { margin: .6rem 0 0; color: var(--muted); font-size: .95rem; max-width: 40em; }
+
+        footer { margin-top: 3rem; color: var(--muted); font-size: .92rem; }
+        footer p { margin: .2rem 0; }
+        a { color: var(--green); text-underline-offset: 3px; }
+
+        @media (max-width: 44rem) {
+            .panes { grid-template-columns: 1fr; }
+            .pane textarea { min-height: 9rem; font-size: 1.2rem; }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .btn, .choice, .segmented button { transition: background-color .15s, border-color .15s, color .15s; }
         }
     </style>
-    <title>മൂലഭദ്രം രഹസ്യഭാഷാ സഹായി</title>
 </head>
 <body>
-<center>
-    <h3>മലയാളത്തിൽ നിന്നും രഹസ്യഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം</h3>
-    <br/>
-    <p><small>'ന', 'ന്ന' സ്വരങ്ങൾക്ക് അവ്യക്തത വന്നേക്കാവുന്ന വാക്കുകൾ മാറ്റുമ്പോൾ</small></p>
-    <input type="radio" id="innale" name="nna_swaram" value="innale" checked>
-    <label for="innale">നഗരം, ഇന്നലെ </label><br/>
-    <input type="radio" id="pinne" name="nna_swaram" value="pinne">
-    <label for="pinne">ഗഗനം, മിന്നൽ</label><br/>
-    <p><small>പോലുള്ള വാക്കുകളിലെ 'ന', 'ന്ന' സ്വരങ്ങൾക്ക് മുൻഗണന</small></p>
-    <br/><br/><br/>
-    <textarea id="plain" name="plain" placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക" rows="12"
-              cols="100" style="border:solid 1px black;"></textarea>
-    <br/><br/>
-    <input type="radio" id="to_moolabhadram" name="direction" value="to_moolabhadram" checked>
-    <label for="to_moolabhadram">മൂലഭദ്രത്തിലേക്ക്</label><br/>
-    <br/>
-    <input type="radio" id="to_malayalam" name="direction" value="to_malayalam">
-    <label for="to_malayalam">മലയാളത്തിലേക്ക്</label><br/>
-    <br/>
-    <button onclick="convert()" style="font-weight:bold;">മാറ്റുക</button>
-    <br/><br/><br/>
-    <textarea readonly id="cipher" name="cipher" placeholder="ഉത്തരം" rows="12" cols="100"
-              style="border:solid 1px black;"></textarea>
-    <br/><br/><br/><br/>
-    <h5><span id="Vowels">സ്വരാക്ഷരങ്ങൾ</span></h5>
-    <table>
-        <tbody >
-        <tr>
-            <td>അ
-            </td>
-            <td>ആ
-            </td>
-            <td>ഇ
-            </td>
-            <td>ഈ
-            </td>
-            <td>ഉ
-            </td>
-            <td>ഊ
-            </td>
-            <td>ഋ
-            </td>
-            <td>എ
-            </td>
-            <td>ഏ
-            </td>
-            <td>ഐ
-            </td>
-            <td>ഒ
-            </td>
-            <td>ഓ
-            </td>
-            <td>ഔ
-            </td>
-            <td>അം
-            </td>
-            <td>അഃ
-            </td>
-        </tr>
-        <tr>
-            <td>ക
-            </td>
-            <td>കാ
-            </td>
-            <td>കി
-            </td>
-            <td>കീ
-            </td>
-            <td>കു
-            </td>
-            <td>കൂ
-            </td>
-            <td>കൃ
-            </td>
-            <td>കെ
-            </td>
-            <td>കേ
-            </td>
-            <td>കൈ
-            </td>
-            <td>കൊ
-            </td>
-            <td>കോ
-            </td>
-            <td>കൗ
-            </td>
-            <td>കം
-            </td>
-            <td>കഃ
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <h5><span id="Consonants">വ്യഞ്ജനാക്ഷരങ്ങൾ</span></h5>
-    <table>
-        <tbody>
-        <tr>
-            <td>ക
-            </td>
-            <td>ഖ
-            </td>
-            <td>ഗ
-            </td>
-            <td>ഘ
-            </td>
-            <td>ങ
-            </td>
-            <td>ച
-            </td>
-            <td>ഛ
-            </td>
-            <td>ജ
-            </td>
-            <td>ഝ
-            </td>
-            <td>ഞ
-            </td>
-            <td>ട
-            </td>
-            <td>ഠ
-            </td>
-            <td>ഡ
-            </td>
-            <td>ഢ
-            </td>
-            <td>ണ
-            </td>
-            <td>ത
-            </td>
-            <td>ഥ
-            </td>
-            <td>ദ
-            </td>
-            <td>ധ
-            </td>
-            <td>ന
-            </td>
-            <td>പ
-            </td>
-            <td>ഫ
-            </td>
-            <td>ബ
-            </td>
-            <td>ഭ
-            </td>
-            <td>മ
-            </td>
-        </tr>
-        <tr>
-            <td>അ
-            </td>
-            <td>ഗ
-            </td>
-            <td>ഖ
-            </td>
-            <td>ങ
-            </td>
-            <td>ഘ
-            </td>
-            <td>ട
-            </td>
-            <td>ഠ
-            </td>
-            <td>ഡ
-            </td>
-            <td>ഢ
-            </td>
-            <td>ണ
-            </td>
-            <td>ച
-            </td>
-            <td>ഛ
-            </td>
-            <td>ജ
-            </td>
-            <td>ഝ
-            </td>
-            <td>ഞ
-            </td>
-            <td>പ
-            </td>
-            <td>ഫ
-            </td>
-            <td>ബ
-            </td>
-            <td>ഭ
-            </td>
-            <td>മ
-            </td>
-            <td>ത
-            </td>
-            <td>ഥ
-            </td>
-            <td>ദ
-            </td>
-            <td>ധ
-            </td>
-            <td>ന
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <br/>
-    <table>
-        <tbody>
-        <tr>
-            <td>യ
-            </td>
-            <td>ര
-            </td>
-            <td>ല
-            </td>
-            <td>വ
-            </td>
-            <td>ശ
-            </td>
-            <td>ഷ
-            </td>
-            <td>സ
-            </td>
-            <td>ഹ
-            </td>
-            <td>ള
-            </td>
-            <td>ഴ
-            </td>
-            <td>റ
-            </td>
-            <td>ക്ഷ
-            </td>
-        </tr>
-        <tr>
-            <td>ശ
-            </td>
-            <td>ഷ
-            </td>
-            <td>സ
-            </td>
-            <td>ഹ
-            </td>
-            <td>യ
-            </td>
-            <td>ര
-            </td>
-            <td>ല
-            </td>
-            <td>വ
-            </td>
-            <td>ക്ഷ
-            </td>
-            <td>റ
-            </td>
-            <td>ഴ
-            </td>
-            <td>ള
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<div class="page">
+    <header>
+        <h1>മൂലഭദ്രം <span class="coded" id="titleCoded" aria-hidden="true">നൂസധബ്ഷം</span></h1>
+        <p class="lede">മലയാളത്തിൽ നിന്നും രഹസ്യഭാഷയായ മൂലഭദ്രത്തിലേക്കും തിരിച്ചും മാറ്റാം. മുകളിലെ രണ്ടാമത്തെ വരി ഒന്നാമത്തേതിന്റെ മൂലഭദ്രരൂപമാണ്.</p>
+    </header>
 
-    <h5><span id="Special case">പ്രത്യേകം ('പന'യിലെ 'ന')</span></h5>
-    <table>
-        <tbody>
-        <tr>
-            <td>ന
-            </td>
-            <td>റ്റ
-            </td>
-        </tr>
-        <tr>
-            <td>റ്റ
-            </td>
-            <td>ന
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <main>
+        <div class="direction">
+            <div class="segmented" role="group" aria-label="മാറ്റേണ്ട ദിശ">
+                <button type="button" id="dirEncode" aria-pressed="true">മൂലഭദ്രത്തിലേക്ക്</button>
+                <button type="button" id="dirDecode" aria-pressed="false">മലയാളത്തിലേക്ക്</button>
+            </div>
+            <button type="button" class="btn" id="swap" title="ഉത്തരം മുകളിലേക്ക് എടുത്ത് തിരിച്ചു മാറ്റുക">⇄ തിരിച്ചു മാറ്റുക</button>
+        </div>
 
-    <h5><span id="Chillus">ചില്ല് അക്ഷരങ്ങൾ</span></h5>
-    <table>
-        <tbody>
-        <tr>
-            <td>ൽ
-            </td>
-            <td>ൻ
-            </td>
-            <td>ർ
-            </td>
-            <td>ൾ
-            </td>
-        </tr>
-        <tr>
-            <td>പ്
-            </td>
-            <td>റ്റ്
-            </td>
-            <td>ഷ്
-            </td>
-            <td>ക്ഷ്
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <br/><br/><br/><br/>
+        <div class="panes">
+            <section class="pane">
+                <div class="pane-head"><label for="plain" id="inLabel">മലയാളം</label></div>
+                <textarea id="plain" spellcheck="false" autocapitalize="off" autocomplete="off"
+                          placeholder="മാറ്റാനുള്ള വാക്കുകളോ വാചകങ്ങളോ ഇവിടെ എഴുതുക"></textarea>
+                <div class="pane-foot">
+                    <button type="button" class="btn" id="example">ഉദാഹരണം</button>
+                    <button type="button" class="btn" id="clear">മായ്ക്കുക</button>
+                </div>
+            </section>
+            <section class="pane result">
+                <div class="pane-head"><label for="cipher" id="outLabel">മൂലഭദ്രം</label></div>
+                <textarea id="cipher" readonly spellcheck="false" placeholder="ഉത്തരം ഇവിടെ കാണാം" aria-live="polite"></textarea>
+                <div class="pane-foot">
+                    <button type="button" class="btn primary" id="copy">പകർത്തുക</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="options">
+            <div class="option">
+                <h2 id="nTitle"></h2>
+                <p id="nHelp"></p>
+                <div class="choices" role="group" aria-labelledby="nTitle">
+                    <button type="button" class="choice" id="nDental" aria-pressed="true"><b></b><span></span></button>
+                    <button type="button" class="choice" id="nAlveolar" aria-pressed="false"><b></b><span></span></button>
+                </div>
+            </div>
+            <div class="option" id="kkOption">
+                <h2 id="kkTitle">‘ക്ക’ എന്ന കൂട്ടക്ഷരം</h2>
+                <p>ലളിതമായ രീതിയിൽ എഴുതിയത് തിരിച്ചു മാറ്റുമ്പോൾ ‘ക്ക’ ചിലപ്പോൾ ‘ക’ ആകും.</p>
+                <div class="choices" role="group" aria-labelledby="kkTitle">
+                    <button type="button" class="choice" id="kkSimple" aria-pressed="true"><b>ലളിതം</b><span></span></button>
+                    <button type="button" class="choice" id="kkExact" aria-pressed="false"><b>കൃത്യം</b><span></span></button>
+                </div>
+            </div>
+        </div>
+
+        <details class="reference">
+            <summary>അക്ഷരപ്പട്ടിക</summary>
+            <h3>സ്വരാക്ഷരങ്ങൾ</h3>
+            <div class="pairs" id="refVowels"></div>
+            <h3>വ്യഞ്ജനാക്ഷരങ്ങൾ</h3>
+            <div class="pairs" id="refConsonants"></div>
+            <h3>ചില്ലക്ഷരങ്ങൾ</h3>
+            <div class="pairs" id="refChillus"></div>
+            <h3>പ്രത്യേകം</h3>
+            <div class="pairs" id="refSpecial"></div>
+            <p class="note">‘പന’യിലെ ‘ന’ ↔ ‘റ്റ’. സ്വരമില്ലാത്ത ‘ക്’ എന്നത് ‘ഉ്’ എന്ന് എഴുതുന്നു (ശക്തി → യഉ്പി).</p>
+        </details>
+    </main>
+
     <footer>
-        <small>
-            <br/>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം: <a href="https://en.wikipedia.org/wiki/Mulabhadra"
-                                                      target="_blank">Wikipedia</a>
-            &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank">YouTube Part 1</a>
-            &nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=32MTNi2F470" target="_blank">YouTube Part 2</a>
-            <br/>മലയാളം അക്ഷരങ്ങൾ Unicode: <a href="https://everythingfonts.com/unicode/malayalam" target="_blank">Quick
-            reference</a>
-            &nbsp;&nbsp;<a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank">Detailed</a>
-            <br/>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7"
-                                           target="_blank">Rajneesh Kesavan</a>
-            <br/>Source code on <a href="https://github.com/rajneeshk7/moolabhadram"
-                                   target="_blank">GitHub</a>
-        </small>
+        <p>മൂലഭദ്രത്തെപ്പറ്റി കൂടുതൽ അറിയാം:
+            <a href="https://en.wikipedia.org/wiki/Mulabhadra" target="_blank" rel="noopener">Wikipedia</a>,
+            <a href="https://www.youtube.com/watch?v=9o-0oBqP2pU" target="_blank" rel="noopener">YouTube Part 1</a>,
+            <a href="https://www.youtube.com/watch?v=32MTNi2F470" target="_blank" rel="noopener">YouTube Part 2</a></p>
+        <p>മലയാളം അക്ഷരങ്ങൾ Unicode:
+            <a href="https://everythingfonts.com/unicode/malayalam" target="_blank" rel="noopener">Quick reference</a>,
+            <a href="https://unicode.org/charts/PDF/U0D00.pdf" target="_blank" rel="noopener">Detailed</a></p>
+        <p>&copy; Copyright 2020, <a href="https://www.facebook.com/rajneeshk7" target="_blank" rel="noopener">Rajneesh Kesavan</a>.
+            Source code on <a href="https://github.com/rajneeshk7/moolabhadram" target="_blank" rel="noopener">GitHub</a></p>
     </footer>
-</center>
-<script language="JavaScript">
-        //Convert individual Malayalam unicode characters or sequences by mapping them to another unicode character
-        //or sequence according to Moolabhadram rules
-        let basicMap = new Map([
-            ['\u0D05', '\u0D15'], //a  -> ka
-            ['\u0D06', '\u0D15\u0D3E'], //aa -> kaa
-            ['\u0D07', '\u0D15\u0D3F'], //i  -> ki
-            ['\u0D08', '\u0D15\u0D40'], //ii -> kii
-            ['\u0D09', '\u0D15\u0D41'], //u  -> ku
-            ['\u0D0A', '\u0D15\u0D42'], //uu -> kuu
-            ['\u0D0B', '\u0D15\u0D43'], //Ru -> kRu
-            ['\u0D0E', '\u0D15\u0D46'], //e  -> ke
-            ['\u0D0F', '\u0D15\u0D47'], //E  -> kE
-            ['\u0D10', '\u0D15\u0D48'], //ai -> kai
-            ['\u0D12', '\u0D15\u0D4A'], //o  -> ko
-            ['\u0D13', '\u0D15\u0D4B'], //O  -> kO
-            ['\u0D14', '\u0D15\u0D57'], //ou -> kou
+</div>
 
-            ['\u0D15', '\u0D05'], //ka   -> a
-            ['\u0D16', '\u0D17'], //kha  -> ga
-            ['\u0D17', '\u0D16'], //ga   -> kha
-            ['\u0D18', '\u0D19'], //gha  -> nga
-            ['\u0D19', '\u0D18'], //nga  -> gha
+<script id="core">
+/* ===== മൂലഭദ്രം: conversion core (no DOM access; can be unit-tested in Node) ===== */
+const Moolabhadram = (() => {
+    'use strict';
 
-            ['\u0D1A', '\u0D1F'], //cha   -> ta
-            ['\u0D1B', '\u0D20'], //chha  -> TTa
-            ['\u0D1C', '\u0D21'], //ja    -> da
-            ['\u0D1D', '\u0D22'], //jha   -> DDa
-            ['\u0D1E', '\u0D23'], //nja   -> Na
+    const VIRAMA = '്';
 
-            ['\u0D1F', '\u0D1A'], //ta   -> cha
-            ['\u0D20', '\u0D1B'], //TTa  -> chha
-            ['\u0D21', '\u0D1C'], //da    -> ja
-            ['\u0D22', '\u0D1D'], //DDa   -> jha
-            ['\u0D23', '\u0D1E'], //Na    -> nja
+    // Independent vowels and the matching dependent signs ('' = inherent അ)
+    const VOWELS = ['അ', 'ആ', 'ഇ', 'ഈ', 'ഉ', 'ഊ', 'ഋ', 'ൠ', 'എ', 'ഏ', 'ഐ', 'ഒ', 'ഓ', 'ഔ'];
+    const SIGNS  = ['',  'ാ', 'ി', 'ീ', 'ു', 'ൂ', 'ൃ', 'ൄ', 'െ', 'േ', 'ൈ', 'ൊ', 'ോ', 'ൗ'];
+    const vowelToSign = new Map(VOWELS.map((v, i) => [v, SIGNS[i]]));
+    const signToVowel = new Map(SIGNS.map((s, i) => [s, VOWELS[i]]));
+    signToVowel.set('ൌ', 'ഔ'); // old-style au sign
 
-            ['\u0D24', '\u0D2A'], //tha   -> pa
-            ['\u0D25', '\u0D2B'], //thha  -> pha
-            ['\u0D26', '\u0D2C'], //da   -> ba
-            ['\u0D27', '\u0D2D'], //dha  -> bha
-            ['\u0D28', '\u0D2E'], //na   -> ma
+    // Plain letter swaps (each pair works in both directions)
+    const SWAP_PAIRS = [
+        ['ഖ', 'ഗ'], ['ഘ', 'ങ'],
+        ['ച', 'ട'], ['ഛ', 'ഠ'], ['ജ', 'ഡ'], ['ഝ', 'ഢ'], ['ഞ', 'ണ'],
+        ['ത', 'പ'], ['ഥ', 'ഫ'], ['ദ', 'ബ'], ['ധ', 'ഭ'],
+        ['യ', 'ശ'], ['ര', 'ഷ'], ['ല', 'സ'], ['വ', 'ഹ'],
+        ['ഴ', 'റ']
+    ];
+    const swap = new Map();
+    for (const [a, b] of SWAP_PAIRS) { swap.set(a, b); swap.set(b, a); }
 
-            ['\u0D2A', '\u0D24'], //pa   -> tha
-            ['\u0D2B', '\u0D25'], //pha  -> thha
-            ['\u0D2C', '\u0D26'], //ba   -> da
-            ['\u0D2D', '\u0D27'], //bha  -> dha
-            ['\u0D2E', '\u0D28'], //ma   -> na
+    // Atomic chillus and their base consonants
+    const CHILLU_BASE = new Map([['ൺ', 'ണ'], ['ൻ', 'ന'], ['ർ', 'ര'], ['ൽ', 'ല'], ['ൾ', 'ള'], ['ൿ', 'ക']]);
+    const BASE_CHILLU = new Map([...CHILLU_BASE].map(([c, b]) => [b, c]));
 
-            ['\u0D2F', '\u0D36'], //ya   -> sha
-            ['\u0D30', '\u0D37'], //ra  -> Sha
-            ['\u0D32', '\u0D38'], //la   -> sa
-            ['\u0D35', '\u0D39'], //va  -> ha
-            ['\u0D36', '\u0D2F'], //sha   -> ya
-            ['\u0D37', '\u0D30'], //Sha   -> ra
-            ['\u0D38', '\u0D32'], //sa   -> la
-            ['\u0D39', '\u0D35'], //ha   -> va
-            ['\u0D33', '\u0D15\u0D4D\u0D37'], //La   -> kSha
-            ['\u0D31', '\u0D34'], //Ra   -> zha
-            ['\u0D34', '\u0D31'], //zha  -> Ra
+    const KSH = 'ക്ഷ', TT = 'റ്റ', NT = 'ന്റ';
 
-            //chill aksharangal
-            ['\u0D7A', '\u0D1E\u0D4D'], //NN -> nj
-            ['\u0D7B', '\u0D31\u0D4D\u0D31\u0D4D'], //nn -> tt
-            ['\u0D7C', '\u0D37\u0D4D'], //RR -> Sh
-            ['\u0D7D', '\u0D2A\u0D4D'], //ll -> p
-            ['\u0D7E', '\u0D15\u0D4D\u0D37\u0D4D'] //LL -> kSh
-        ]);
+    const isConsonant = ch => ch >= 'ക' && ch <= 'ഺ';
+    const isSign = ch => signToVowel.has(ch) && ch !== '';
+    const isMalayalam = ch => (ch >= 'ഀ' && ch <= 'ൿ') || ch === '‌';
 
-        //Map to handle the special case of ka with dependent vowel signs. like ki, kii, ku, kuu, ... kSha etc.
-        let kMap = new Map([
-            ['\u0D15\u0D3E', '\u0D06'], //kaa  -> aa
-            ['\u0D15\u0D3F', '\u0D07'], //ki   -> i
-            ['\u0D15\u0D40', '\u0D08'], //kii  -> ii
-            ['\u0D15\u0D41', '\u0D09'], //ku   -> u
-            ['\u0D15\u0D42', '\u0D0A'], //kuu  -> uu
-            ['\u0D15\u0D43', '\u0D0B'], //kRu  -> Ru
-            ['\u0D15\u0D46', '\u0D0E'], //ke   -> e
-            ['\u0D15\u0D47', '\u0D0F'], //kE   -> E
-            ['\u0D15\u0D48', '\u0D10'], //kai  -> ai
-            ['\u0D15\u0D4A', '\u0D12'], //ko   -> o
-            ['\u0D15\u0D4B', '\u0D13'], //kO   -> O
-            ['\u0D15\u0D4C', '\u0D14'], //kou  -> ou
-            ['\u0D15\u0D57', '\u0D14'], //kou  -> ou
-            ['\u0D15\u0D4D\u0D37', '\u0D33'] //kSha -> La
-        ]);
+    // Old-style chillus (consonant + virama + ZWJ) -> atomic chillus; drop stray joiners
+    function normalise(text) {
+        return text.normalize('NFC')
+            .replace(/([ണനരലളക])്‍/g, (m, base) => BASE_CHILLU.get(base))
+            .replace(/‍/g, '');
+    }
 
-        //Set to hold all dependent vowel signs
-        const dependentVowels = new Set();
-        dependentVowels.add('\u0D3E'); //aa
-        dependentVowels.add('\u0D3F'); //i
-        dependentVowels.add('\u0D40'); //ii
-        dependentVowels.add('\u0D41'); //u
-        dependentVowels.add('\u0D42'); //uu
-        dependentVowels.add('\u0D43'); //Ru
-        dependentVowels.add('\u0D46'); //e
-        dependentVowels.add('\u0D47'); //E
-        dependentVowels.add('\u0D48'); //ai
-        dependentVowels.add('\u0D4A'); //o
-        dependentVowels.add('\u0D4B'); //O
-        dependentVowels.add('\u0D4C'); //ou (old)
-        dependentVowels.add('\u0D57'); //ou (new)
-
-        var plainText = document.getElementById("plain").value;
-        var forward = true;
-        var forcePinneStyle = false;
-        var cipherText = '';
-
-        var nonMalayalamChar = true;
-        var firstLetterInWord = true;
-
-        var kState = 'not detected'; //'not detected', 'k found', 'ku found', 'kSh found'
-        var RState = 'not detected'; //'not detected', 'R found', 'Ru found', 'tt found'
-        var nState = 'not detected'; //'not detected', 'n found first', 'n found', 'nu found first', 'nu found', 'nn found'
-
-        var cIsUsed = false;
-
-        function convert() {
-            plainText = document.getElementById("plain").value;
-            plainText = plainText.trim() + ' '; //append one extra space to cover edge cases of trailing incomplete sequences with k, R, n
-            forward = document.getElementById("to_moolabhadram").checked;
-            forcePinneStyle = document.getElementById("pinne").checked;
-            cipherText = '';
-
-            nonMalayalamChar = true;
-            firstLetterInWord = true;
-
-            kState = 'not detected';
-            RState = 'not detected';
-            nState = 'not detected';
-
-            const tokens = Array.from(plainText);
-
-            for (let i = 0; i < tokens.length; i++) {
-                var c = tokens[i]; //read one unicode character
-                cIsUsed = false;
-
-                //store whether previous c is Malayalam or not
-                firstLetterInWord = nonMalayalamChar;
-
-                //store whether current c is Malayalam or not
-                nonMalayalamChar = !isMalayalamChar(c);
-
-                if (c == '\u0D15') { // ക
-                    if (RState != 'not detected') {
-                        cleanupR(c);
-                    }
-                    if (nState != 'not detected') {
-                        cleanupN(c);
-                    }
-                    if (kState == 'k found') { //another ka came right next. convert the first ka to a
-                        cipherText += '\u0D05'; //ka -> a
-                        continue;
-                    }
-                    if (kState == 'ku found') { //ക് followed by ക
-                        //record ക് and proceed
-                        cipherText += '\u0D05\u0D4D'; //ka + chandrakkala -> a + chandrakkala
-                        kState = 'k found';
-                        continue;
-                    }
-                    if (kState == 'not detected') {
-                        kState = 'k found';
-                        continue;
-                    }
-                }
-
-                if (c == "\u0D31") { // റ
-                    if (kState != 'not detected') {
-                        cleanupK(c);
-                    }
-                    if (nState != 'not detected') {
-                        cleanupN(c);
-                    }
-                    if (RState == 'R found') { //another Ra came right next. convert the first Ra to zha
-                        cipherText += '\u0D34'; //Ra -> zha
-                        continue;
-                    }
-                    if (RState == 'not detected') {
-                        RState = 'R found';
-                        continue;
-                    }
-                    if (RState == 'Ru found') {
-                        RState = 'tt found';
-                        continue;
-                    }
-                    if (RState == 'tt found') {
-                        cipherText += '\u0D28'; //tta -> na
-                        RState = 'R found';
-                        continue;
-                    }
-                }
-
-                //na to tta : for words like പന, ആന
-                //na to ma : for words like നഗരം, നിശ
-                if (c == '\u0D28') { // ന
-                    if (kState != 'not detected') {
-                        cleanupK(c);
-                    }
-                    if (RState != 'not detected') {
-                        cleanupR(c);
-                    }
-                    if (!forward) { //reverse i.e., Moolabhadram to Malayalam
-                        if (firstLetterInWord) {
-                            cipherText += '\u0D2E'; //na -> ma
-                        } else {
-                            if (forcePinneStyle) {
-                                cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
-                            } else {
-                                cipherText += '\u0D2E'; //na -> ma
-                            }
-                        }
-                        nState = 'not detected';
-                        continue;
-                    }
-                    if (nState == 'n found first') { //another na came right next. convert the first na to ma
-                        cipherText += '\u0D2E'; //na -> ma
-                        continue;
-                    }
-                    if (nState == 'n found') { //another na came right next. convert the first na to ma or tta
-                        if (forcePinneStyle) {
-                            cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
-                        } else {
-                            cipherText += '\u0D2E'; //na -> ma
-                        }
-                        continue;
-                    }
-                    if (nState == 'not detected') {
-                        if (firstLetterInWord) {
-                            nState = 'n found first';
-                        } else {
-                            nState = 'n found';
-                        }
-                        continue;
-                    }
-                    if (nState == 'nu found first' || nState == 'nu found') {
-                        nState = 'nn found';
-                        if (forcePinneStyle) {
-                            cipherText += '\u0D31\u0D4D\u0D31\u0D4D\u0D31\u0D4D\u0D31'; //nna -> tttta
-                        } else {
-                            cipherText += '\u0D2E\u0D4D\u0D2E'; //nna -> mma
-                        }
-                        nState = 'not detected';
-                        continue;
-                    }
-                }
-
-                if (c == '\u0D37') { //Sh
-                    if (RState != 'not detected') {
-                        cleanupR(c);
-                    }
-                    if (nState != 'not detected') {
-                        cleanupN(c);
-                    }
-                    if (kState == 'ku found') {
-                        kState = 'kSh found';
-                        continue;
-                    }
-                }
-
-                if (c == '\u0D4D') { //chandrakkala
-
-                    if (isPrevCharAnyChill(tokens, i)) {
-                        //ignore this extra chandrakkala and continue
-                        continue;
-                    }
-
-                    if (!forward) { //reverse i.e., Moolabhadram to Malayalam
-                        if (!isMalayalamChar(getNextChar(tokens, i)) && isPrevCharPa(tokens, i)) {
-                            //replace പ് with ൽ instead of ത് if it comes as the last letter of a word
-                            //But exclude cases like (അത് ഇത് ഏത് മറ്റേത് ചിരാത് പലത്), എന്ത്, ഇല്ലത്ത്
-                            if (!isPrevCharAEtc(cipherText) && !isPrev2CharsNu(cipherText) && !isPrev2CharsThu(cipherText)) {
-                                cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7D'; //ൽ
-                            } else {
-                                cipherText += '\u0D4D'; //ത്
-                            }
-                            continue;
-                        } else if (kState != 'kSh found' && !isMalayalamChar(getNextChar(tokens, i)) && isPrevCharSha(tokens, i)) {
-                            //replace ഷ് with ർ instead of ര് if it comes as the last letter of a word
-                            cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7C'; //ർ
-                            continue;
-                        } /* else if (!isMalayalamChar(getNextChar(tokens, i)) && isPrevCharNja(tokens, i)) { //cases like കോൺ
-                            //replace ഞ് with ൺ instead of ണ്
-                            cipherText = cipherText.substring(0, cipherText.length-1) + '\u0D7A'; //ൺ
-                            continue;
-                        } */
-                    }
-
-                    if (kState == 'k found') {
-                        kState = 'ku found';
-                        continue;
-                    }
-                    if (kState == 'kSh found') {
-                        if (isMalayalamChar(getNextChar(tokens, i))
-                        || isPrev4CharsKShu(tokens, i-3)) {
-                            cipherText += '\u0D33\u0D4D'; //ള്   കള്ള് വെള്ളരി
-                        } else {
-                            cipherText += '\u0D7E'; //ൾ  മക്കൾ
-                        }
-                        kState = 'not detected';
-                        continue;
-                    }
-                    if (RState == 'R found') {
-                        RState = 'Ru found';
-                        continue;
-                    }
-                    if (RState == 'tt found') {
-                        cipherText += '\u0D7B'; //nn (regardless of direction)
-                        if (isNextCharZha(tokens, i)) {
-                            cipherText += '\u0D4D'; //append an extra chandrakkala to tidy up handling of എൻ്റെ
-                        }
-                        RState = 'not detected';
-                        continue;
-                    }
-                    if (nState == 'n found first') {
-                        nState = 'nu found first';
-                        continue;
-                    }
-                    if (nState == 'n found') {
-                        nState = 'nu found';
-                        continue;
-                    }
-                }
-
-                cleanupK(c);
-                cleanupR(c);
-                cleanupN(c);
-
-                if (!cIsUsed) {
-                    cipherText += getFromBasicMap(c);
-                }
-            }
-
-            document.getElementById("cipher").value = cipherText.trim();
-        }
-
-        function cleanupK(c) {
-            if (kState == 'k found') {
-                if (dependentVowels.has(c)) {
-                    cipherText += kMap.get('\u0D15' + c); //Map ki, kii ... to i, ii ...
-                    cIsUsed = true;
+    /* Split text into syllable parts.
+       Letter : { c: consonant ('' when the syllable starts with a vowel), t: '' | vowel sign | virama, chillu }
+       Other  : { lit: text, word: true when it does not break a word } */
+    function parse(text) {
+        const s = Array.from(text);
+        const out = [];
+        let i = 0;
+        const tail = part => {
+            if (s[i] === VIRAMA) { part.t = VIRAMA; i++; }
+            else if (isSign(s[i])) { part.t = s[i]; i++; }
+            return part;
+        };
+        while (i < s.length) {
+            const ch = s[i];
+            if (vowelToSign.has(ch)) {
+                i++;
+                // ഉ് (and അ് written by older versions of this page) stands for a bare ക്
+                if ((ch === 'ഉ' || ch === 'അ') && s[i] === VIRAMA) { out.push({ c: '', t: VIRAMA }); i++; }
+                else out.push({ c: '', t: vowelToSign.get(ch) });
+            } else if (CHILLU_BASE.has(ch)) {
+                i++;
+                if (ch === 'ൻ' && (s[i] === 'റ' || (s[i] === VIRAMA && s[i + 1] === 'റ'))) { // ൻ്റ / ൻറ
+                    i += s[i] === VIRAMA ? 2 : 1;
+                    out.push(tail({ c: NT, t: '' }));
                 } else {
-                    cipherText += '\u0D05'; //ka -> a
+                    if (s[i] === VIRAMA) i++; // stray virama after a chillu
+                    out.push({ c: CHILLU_BASE.get(ch), t: VIRAMA, chillu: true });
                 }
-            } else if (kState == 'ku found') {
-                cipherText += '\u0D05\u0D4D'; //ka + chandrakkala -> a + chandrakkala
-            } else if (kState == 'kSh found') {
-                cipherText += '\u0D33'; //L + mapping of next char
-            }
-            kState = 'not detected';
-        }
-
-        function cleanupR(c) {
-            if (RState == 'R found') {
-                cipherText += '\u0D34'; //Ra -> zha
-            } else if (RState == 'Ru found') {
-                cipherText += '\u0D34\u0D4D'; //Ra + chandrakkala -> zha + chandrakkala
-            } else if (RState == 'tt found') {
-                cipherText += '\u0D28'; //tta -> na
-            }
-            RState = 'not detected';
-        }
-
-        function cleanupN(c) {
-            if (nState == 'n found first') {
-                cipherText += '\u0D2E'; //na -> ma
-            } else if (nState == 'n found') {
-                if (forward) {
-                    if (forcePinneStyle) {
-                        cipherText += '\u0D31\u0D4D\u0D31'; //na -> tta
-                    } else {
-                        cipherText += '\u0D2E'; //na -> ma
-                    }
-                } else {
-                    cipherText += '\u0D2E'; //na -> ma
+            } else if (isConsonant(ch)) {
+                let c = ch;
+                i++;
+                if (s[i] === VIRAMA) {
+                    const pair = ch + s[i + 1];
+                    if (pair === 'കഷ') { c = KSH; i += 2; }
+                    else if (pair === 'ററ') { c = TT; i += 2; }
+                    else if (pair === 'നറ') { c = NT; i += 2; }
                 }
-            } else if (nState == 'nu found first') {
-                cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
-            } else if (nState == 'nu found') {
-                if (forward) {
-                    if (forcePinneStyle) {
-                        cipherText += '\u0D31\u0D4D\u0D31\u0D4D'; //na + chandrakkala -> tta + chandrakkala
-                    } else {
-                        cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
-                    }
-                } else {
-                    cipherText += '\u0D2E\u0D4D'; //na + chandrakkala -> ma + chandrakkala
+                out.push(tail({ c, t: '' }));
+            } else {
+                i++;
+                out.push({ lit: ch, word: isMalayalam(ch) });
+            }
+        }
+        return out;
+    }
+
+    // ---------- Malayalam -> Moolabhadram ----------
+    function encodePart(p, prev, next, wordStart, opt) {
+        const t = p.t;
+        switch (p.c) {
+            case '': // vowel -> ക + vowel sign
+                return 'ക' + t;
+            case 'ക':
+                if (t !== VIRAMA) return signToVowel.get(t);
+                // ക്ക: the doubled ക is spoken as one "empty" consonant
+                if (!opt.exactKK && next && next.c === 'ക') return '';
+                return 'ഉ' + VIRAMA; // bare ക് has no vowel to show, so it is written as ഉ്
+            case KSH: return 'ള' + t;
+            case 'ള': return KSH + t;
+            case TT:  return t === VIRAMA ? 'ൻ' : 'ന' + t;
+            case NT:  return TT + VIRAMA + 'ഴ' + t;
+            case 'മ': return 'ന' + t;
+            case 'ന': {
+                if (p.chillu) return TT + VIRAMA;
+                let dental;
+                if (wordStart) dental = true;
+                else if (prev && prev.c === 'ന' && prev.t === VIRAMA && !prev.chillu) dental = prev.dental;
+                else if (t === VIRAMA && next && 'തഥദധ'.includes(next.c)) dental = true; // ന്ത ന്ദ ന്ധ
+                else dental = !opt.alveolar;
+                p.dental = dental;
+                return (dental ? 'മ' : TT) + t;
+            }
+            case 'ല': return p.chillu ? 'പ' + VIRAMA : 'സ' + t;
+            default:  return (swap.get(p.c) || p.c) + t;
+        }
+    }
+
+    // ---------- Moolabhadram -> Malayalam ----------
+    // Consonants after which a word-final പ് is read as ത് rather than ൽ (given here in cipher form)
+    const TH_AFTER = new Set(['ശ', 'ഷ', 'ഴ', 'സ', KSH, 'റ', 'ഹ', 'യ', 'ര', 'ല', 'വ']);
+    // ണ് joins only these following letters (given in cipher form); otherwise it is the chillu ൺ
+    const NN_JOINS = new Set(['ച', 'ഛ', 'ജ', 'ഝ', 'ഞ', 'ന', 'ശ', 'ഹ']);
+
+    function decodePart(p, prev, next, wordStart, opt, lastOut) {
+        const t = p.t;
+        switch (p.c) {
+            case '':
+                if (t === VIRAMA) { // bare ക്; at the end of a word it is nearly always ക്ക്
+                    const afterBareK = prev && prev.c === '' && prev.t === VIRAMA;
+                    return (!next && !afterBareK) ? 'ക്ക്' : 'ക്';
                 }
-            }
-            nState = 'not detected';
+                // ർ ൾ ൽ are normally followed by a doubled ക (ആൾക്കാർ, നിൽക്കുക)
+                return ('ർൾൽ'.includes(lastOut) && lastOut ? 'ക്ക' : 'ക') + t;
+            case 'ക':
+                return t === VIRAMA ? 'ഉ' + VIRAMA : signToVowel.get(t);
+            case KSH:
+                if (t !== VIRAMA) return 'ള' + t;
+                return ((next && next.c === KSH) || (prev && prev.c === KSH && prev.t === VIRAMA)) ? 'ള്' : 'ൾ';
+            case 'ള': return KSH + t;
+            case TT:
+                if (t !== VIRAMA) return 'ന' + t;
+                if (next && next.c === 'ഴ') { next.skip = true; return 'ൻ' + VIRAMA + 'റ' + next.t; } // ൻ്റ
+                return (next && (next.c === TT || next.c === 'ശ' || next.c === 'ന')) ? 'ന്' : 'ൻ';
+            case 'ന':
+                if (p.chillu) return TT + VIRAMA;
+                if (t === VIRAMA || wordStart || (prev && prev.t === VIRAMA)) return 'മ' + t;
+                return (opt.alveolar ? TT : 'മ') + t;
+            case 'മ': return 'ന' + t;
+            case 'പ':
+                if (t !== VIRAMA) return 'ത' + t;
+                if (next) return (next.c === '' || next.c === 'ത') ? 'ൽ' : 'ത്';
+                if (!prev || prev.t === VIRAMA) return 'ത്';                               // ഇല്ലത്ത്, എന്ത്
+                if (prev.c === 'ക' && ['', 'ി', 'ൂ', 'േ'].includes(prev.t)) return 'ത്';      // അത്, ഇത്, ഏത്
+                if (['ു', 'ൃ', 'െ', 'േ'].includes(prev.t)) return 'ത്';                      // വലുത്, മറ്റേത്
+                if (prev.t === '' && TH_AFTER.has(prev.c)) return 'ത്';                     // പലത്
+                return 'ൽ';                                                               // പകൽ, പാൽ, വീട്ടിൽ
+            case 'ഷ':
+                if (t !== VIRAMA) return 'ര' + t;
+                return (next && next.c === 'ശ') ? 'ര്' : 'ർ';                              // കാര്യം / അർക്കൻ
+            case 'ഞ':
+                if (t !== VIRAMA) return 'ണ' + t;
+                return (next && !NN_JOINS.has(next.c)) ? 'ൺ' : 'ണ്';
+            default:
+                return (swap.get(p.c) || p.c) + t;
         }
+    }
 
-        function getFromBasicMap(c) {
-            if (basicMap.has(c)) {
-                return basicMap.get(c);
-            }
-            return c;
+    /* options: decode   - false: Malayalam -> Moolabhadram, true: the reverse
+                alveolar - read/write the ambiguous ന inside a word as റ്റ instead of മ
+                exactKK  - keep ക്ക distinguishable from ക when encoding */
+    function convert(text, options) {
+        const opt = Object.assign({ decode: false, alveolar: false, exactKK: false }, options);
+        const parts = parse(normalise(text));
+        const fn = opt.decode ? decodePart : encodePart;
+        let out = '';
+        let lastOut = '';
+        for (let i = 0; i < parts.length; i++) {
+            const p = parts[i];
+            if (p.lit !== undefined) { out += p.lit; lastOut = ''; continue; }
+            if (p.skip) continue;
+            const before = parts[i - 1], after = parts[i + 1];
+            const prev = before && before.lit === undefined ? before : null;
+            const next = after && after.lit === undefined ? after : null;
+            const wordStart = !before || (before.lit !== undefined && !before.word);
+            lastOut = fn(p, prev, next, wordStart, opt, lastOut);
+            out += lastOut;
         }
+        return out;
+    }
 
-        function getNextChar(tokens, i) {
-            var next = i+1;
-            if (next < tokens.length) {
-                return tokens[next];
-            }
-            return ' ';
-        }
-
-        function isWhiteSpace(cc) {
-            var result = (cc.trim().length == 0);
-            return result;
-        }
-
-        function isMalayalamChar(cc) {
-            var result = ( (cc >= '\u0D00') && (cc <= '\u0D7F') );
-            return result;
-        }
-
-        function isNextCharZha(tokens, i) {
-            var next = i+1;
-            if (next < tokens.length) {
-                //ഴ is coming which will map to റ
-                return (tokens[next] == '\u0D34');
-            }
-            return false;
-        }
-
-        function isPrev4CharsKShu(tokens, i) {
-            var result = false;
-            var prev1 = i-1;
-            var prev2 = i-2;
-            var prev3 = i-3;
-            var prev4 = i-4;
-            if (prev4 >= 0) {
-                //ക്ഷ് was present which mapped to ള്
-                result = ( (tokens[prev4] == '\u0D15') && (tokens[prev3] == '\u0D4D') && (tokens[prev2] == '\u0D37') && (tokens[prev1] == '\u0D4D') );
-            }
-            //console.log('isPrev4CharsKShu : '+result);
-            return result;
-        }
-
-        function isPrevCharPa(tokens, i) {
-            var result = false;
-            var prev1 = i-1;
-            if (prev1 >= 0) {
-                //പ was present which was mapped to ത
-                result = (tokens[prev1] == '\u0D2A');
-            }
-            //console.log('isPrevCharPa : '+result);
-            return result;
-        }
-
-        function isPrevCharSha(tokens, i) {
-            var result = false;
-            var prev1 = i-1;
-            if (prev1 >= 0) {
-                //ഷ was present which was mapped to ര
-                result = (tokens[prev1] == '\u0D37');
-            }
-            //console.log('isPrevCharSha : '+result);
-            return result;
-        }
-
-        function isPrevCharNja(tokens, i) {
-            var result = false;
-            var prev1 = i-1;
-            if (prev1 >= 0) {
-                //ഞ was present which was mapped to ണ
-                result = (tokens[prev1] == '\u0D1E');
-            }
-            //console.log('isPrevCharNja : '+result);
-            return result;
-        }
-
-        //exclude അത് ഇത് ഏത് മറ്റേത് പലത്
-        function isPrevCharAEtc(cipherText) {
-            var result = false;
-            if (cipherText.length > 1) {
-                //അ ഇ ല etc. was present
-                result = (     (cipherText.charAt(cipherText.length-2) == '\u0D05')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D07')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D0A')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D0F')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D3E')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D43')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D46')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D47')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D2F')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D30')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D31')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D32')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D33')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D34')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D35')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D36')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D37')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D38')
-                            || (cipherText.charAt(cipherText.length-2) == '\u0D39')
-                            );
-            }
-            //console.log('isPrevCharAEtc : '+result);
-            return result;
-        }
-
-        function isPrev2CharsNu(cipherText) {
-            var result = false;
-            if (cipherText.length > 2) {
-                //ന് was present
-                result = ( (cipherText.charAt(cipherText.length-3) == '\u0D28') && (cipherText.charAt(cipherText.length-2) == '\u0D4D') );
-            }
-            //console.log('isPrev2CharsNu : '+result);
-            return result;
-        }
-
-        function isPrev2CharsThu(cipherText) {
-            var result = false;
-            if (cipherText.length > 2) {
-                //ത് was present
-                result = ( (cipherText.charAt(cipherText.length-3) == '\u0D24') && (cipherText.charAt(cipherText.length-2) == '\u0D4D') );
-            }
-            //console.log('isPrev2CharsThu : '+result);
-            return result;
-        }
-
-        function isPrevCharAnyChill(tokens, i) {
-            var result = false;
-            var prev1 = i-1;
-            if (prev1 >= 0) {
-                //check chandrakkala and all chills
-                result = ( (tokens[prev1] == '\u0D4D') || (tokens[prev1] == '\u0D7A') || (tokens[prev1] == '\u0D7B')
-                || (tokens[prev1] == '\u0D7C') || (tokens[prev1] == '\u0D7D') || (tokens[prev1] == '\u0D7E'));
-            }
-            //console.log('isPrevCharAnyChill : '+result);
-            return result;
-        }
-
+    return { convert, VOWELS, SIGNS, SWAP_PAIRS };
+})();
 </script>
 
+<script>
+/* ===== Page behaviour ===== */
+(() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const input = $('plain'), output = $('cipher');
+    const state = { decode: false, alveolar: false, exactKK: false };
+
+    // Remember the chosen options between visits (ignored when storage is unavailable)
+    const STORE_KEY = 'moolabhadram-options';
+    try { Object.assign(state, JSON.parse(localStorage.getItem(STORE_KEY)) || {}); } catch (e) { /* ignore */ }
+    const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } };
+
+    const enc = (text, extra) => Moolabhadram.convert(text, Object.assign({ decode: false }, extra));
+    const dec = (text, extra) => Moolabhadram.convert(text, Object.assign({ decode: true }, extra));
+    const press = (el, on) => el.setAttribute('aria-pressed', String(on));
+    const setChoice = (el, title, example) => {
+        if (title) el.querySelector('b').textContent = title;
+        el.querySelector('span').textContent = example;
+    };
+
+    function render() {
+        output.value = Moolabhadram.convert(input.value, state);
+        $('copy').disabled = $('swap').disabled = !output.value;
+        $('clear').disabled = !input.value;
+    }
+
+    function renderControls() {
+        press($('dirEncode'), !state.decode);
+        press($('dirDecode'), state.decode);
+        $('inLabel').textContent = state.decode ? 'മൂലഭദ്രം' : 'മലയാളം';
+        $('outLabel').textContent = state.decode ? 'മലയാളം' : 'മൂലഭദ്രം';
+
+        // The examples shown on the option buttons come from the converter itself
+        if (state.decode) {
+            $('nTitle').textContent = 'വാക്കിനിടയിലെ ‘ന’';
+            $('nHelp').textContent = 'മൂലഭദ്രത്തിലെ ‘ന’ മലയാളത്തിലെ ‘മ’യോ ‘റ്റ’യോ ആകാം.';
+            setChoice($('nDental'), 'ന → മ', 'കാന → ' + dec('കാന', { alveolar: false }));
+            setChoice($('nAlveolar'), 'ന → റ്റ', 'കാന → ' + dec('കാന', { alveolar: true }));
+        } else {
+            $('nTitle').textContent = 'വാക്കിനിടയിലെ ‘ന’, ‘ന്ന’';
+            $('nHelp').textContent = 'ഏതു പോലുള്ള വാക്കുകളിലെ ഉച്ചാരണത്തിന് മുൻഗണന നൽകണം?';
+            setChoice($('nDental'), 'നഗരം, ഇന്നലെ', 'ഇന്നലെ → ' + enc('ഇന്നലെ', { alveolar: false }));
+            setChoice($('nAlveolar'), 'ഗഗനം, മിന്നൽ', 'മിന്നൽ → ' + enc('മിന്നൽ', { alveolar: true }));
+        }
+        press($('nDental'), !state.alveolar);
+        press($('nAlveolar'), state.alveolar);
+
+        $('kkOption').hidden = state.decode;
+        setChoice($('kkSimple'), '', 'ചക്ക → ' + enc('ചക്ക', { exactKK: false }));
+        setChoice($('kkExact'), '', 'ചക്ക → ' + enc('ചക്ക', { exactKK: true }));
+        press($('kkSimple'), !state.exactKK);
+        press($('kkExact'), state.exactKK);
+    }
+
+    function update(change) {
+        Object.assign(state, change);
+        save();
+        renderControls();
+        render();
+    }
+
+    input.addEventListener('input', render);
+    $('dirEncode').addEventListener('click', () => update({ decode: false }));
+    $('dirDecode').addEventListener('click', () => update({ decode: true }));
+    $('nDental').addEventListener('click', () => update({ alveolar: false }));
+    $('nAlveolar').addEventListener('click', () => update({ alveolar: true }));
+    $('kkSimple').addEventListener('click', () => update({ exactKK: false }));
+    $('kkExact').addEventListener('click', () => update({ exactKK: true }));
+
+    $('swap').addEventListener('click', () => {
+        input.value = output.value;
+        update({ decode: !state.decode });
+    });
+    $('clear').addEventListener('click', () => { input.value = ''; render(); input.focus(); });
+    $('example').addEventListener('click', () => {
+        const sample = 'കേരളം മലയാളികളുടെ മാതൃഭൂമി';
+        input.value = state.decode ? enc(sample, state) : sample;
+        render();
+    });
+
+    let copyTimer;
+    $('copy').addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(output.value);
+        } catch (e) { // older browsers, or pages not served over https
+            output.select();
+            document.execCommand('copy');
+        }
+        $('copy').textContent = 'പകർത്തി';
+        clearTimeout(copyTimer);
+        copyTimer = setTimeout(() => { $('copy').textContent = 'പകർത്തുക'; }, 1600);
+    });
+
+    // Letter table, built from the same data the converter uses
+    const pair = (a, b) => {
+        const el = document.createElement('div');
+        el.className = 'pair';
+        el.innerHTML = '<span></span><span></span>';
+        el.firstChild.textContent = a;
+        el.lastChild.textContent = b;
+        return el;
+    };
+    const fill = (id, letters) => letters.forEach(l => $(id).appendChild(pair(l, enc(l, { alveolar: false }))));
+    fill('refVowels', Moolabhadram.VOWELS.filter(v => v !== 'ൠ').concat(['അം', 'അഃ']));
+    fill('refConsonants', Array.from('കഖഗഘങചഛജഝഞടഠഡഢണതഥദധനപഫബഭമയരലവശഷസഹളഴറ').concat(['ക്ഷ']));
+    fill('refChillus', ['ൺ', 'ൻ', 'ർ', 'ൽ', 'ൾ']);
+    $('refSpecial').appendChild(pair('ന', 'റ്റ'));
+    $('refSpecial').appendChild(pair('റ്റ', 'ന'));
+    $('refSpecial').appendChild(pair('ന്റ', enc('ന്റ')));
+    $('refSpecial').appendChild(pair('ക്', enc('ക്ത').slice(0, 2)));
+
+    $('titleCoded').textContent = enc('മൂലഭദ്രം');
+    renderControls();
+    render();
+})();
+</script>
 </body>
 </html>
